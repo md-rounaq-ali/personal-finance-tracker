@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal Finance Tracker — Track income, expenses, and generate reports">
+    <title>{% block title %}Dashboard{% endblock %} — FinTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">💰</span>
+            <span class="brand-text">FinTrack</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="{{ url_for('transactions.list_transactions') }}" class="nav-link {% if request.endpoint and 'transactions' in request.endpoint %}active{% endif %}">
+                <span class="nav-icon">💳</span>
+                <span class="nav-text">Transactions</span>
+            </a>
+            <a href="{{ url_for('categories.manage') }}" class="nav-link {% if request.endpoint and 'categories' in request.endpoint %}active{% endif %}">
+                <span class="nav-icon">🏷️</span>
+                <span class="nav-text">Categories</span>
+            </a>
+            <a href="{{ url_for('accounts.manage') }}" class="nav-link {% if request.endpoint and 'accounts' in request.endpoint %}active{% endif %}">
+                <span class="nav-icon">🏦</span>
+                <span class="nav-text">Accounts</span>
+            </a>
+            <a href="{{ url_for('reports.monthly') }}" class="nav-link {% if request.endpoint and 'reports' in request.endpoint %}active{% endif %}">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Reports</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <span class="user-avatar">{{ current_user.username[0]|upper }}</span>
+                <span class="user-name">{{ current_user.username }}</span>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link logout-link">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-text">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="mobile-brand">💰 FinTrack</span>
+        <a href="{{ url_for('auth.logout') }}" class="mobile-logout">🚪</a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}" onclick="this.remove()">
+                <span>{{ message }}</span>
+                <button class="flash-close">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

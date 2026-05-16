@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">{{ current_month_name }} Overview</p>
+    </div>
+    <a href="{{ url_for('transactions.add_transaction') }}" class="btn btn-primary">+ Add Transaction</a>
+</div>
+
+<!-- Summary Cards -->
+<div class="stats-grid">
+    <div class="stat-card stat-income">
+        <div class="stat-icon">📥</div>
+        <div class="stat-info">
+            <span class="stat-label">Income</span>
+            <span class="stat-value" data-counter="{{ total_income }}">₹{{ "{:,.2f}".format(total_income) }}</span>
+        </div>
+    </div>
+    <div class="stat-card stat-expense">
+        <div class="stat-icon">📤</div>
+        <div class="stat-info">
+            <span class="stat-label">Expenses</span>
+            <span class="stat-value" data-counter="{{ total_expense }}">₹{{ "{:,.2f}".format(total_expense) }}</span>
+        </div>
+    </div>
+    <div class="stat-card stat-balance {% if balance >= 0 %}stat-positive{% else %}stat-negative{% endif %}">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+            <span class="stat-label">Net Savings</span>
+            <span class="stat-value" data-counter="{{ balance }}">₹{{ "{:,.2f}".format(balance) }}</span>
+        </div>
+    </div>
+    <div class="stat-card stat-total">
+        <div class="stat-icon">🏦</div>
+        <div class="stat-info">
+            <span class="stat-label">Total Balance</span>
+            <span class="stat-value" data-counter="{{ total_balance_all_accounts }}">₹{{ "{:,.2f}".format(total_balance_all_accounts) }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Budget Alerts -->
+{% if budget_alerts %}
+<div class="budget-alerts">
+    <h3 class="section-title">⚠️ Budget Alerts</h3>
+    <div class="alerts-grid">
+        {% for alert in budget_alerts %}
+        <div class="alert-card {% if alert.exceeded %}alert-exceeded{% else %}alert-warning{% endif %}">
+            <div class="alert-header">
+                <span>{{ alert.icon }} {{ alert.category }}</span>
+                <span class="alert-pct">{{ "%.0f"|format(alert.percentage) }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill {% if alert.exceeded %}exceeded{% endif %}" style="width: {{ alert.percentage }}%"></div>
+            </div>
+            <div class="alert-details">
+                <span>₹{{ "{:,.0f}".format(alert.spent) }} / ₹{{ "{:,.0f}".format(alert.budget) }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Charts Row -->
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3 class="card-title">Spending by Category</h3>
+        {% if category_labels %}
+        <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span class="empty-icon">🍩</span>
+            <p>No expenses this month yet</p>
+        </div>
+        {% endif %}
+    </div>
+    <div class="chart-card">
+        <h3 class="card-title">Monthly Trend</h3>
+        <div class="chart-container">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Recent Transactions</h3>
+        <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-sm btn-outline">View All →</a>
+    </div>
+    {% if recent_transactions %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Account</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in recent_transactions %}
+                <tr class="fade-in">
+                    <td class="text-muted">{{ t.transaction_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ t.description or '—' }}</td>
+                    <td>
+                        {% if t.category %}
+                        <span class="category-badge" style="--cat-color: {{ t.category.color }}">
+                            {{ t.category.icon }} {{ t.category.name }}
+                        </span>
+                        {% else %}
+                        <span class="text-muted">Uncategorized</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">{{ t.account.name if t.account else '—' }}</td>
+                    <td class="text-right">
+                        <span class="amount {{ 'income' if t.type == 'income' else 'expense' }}">
+                            {{ '+' if t.type == 'income' else '-' }}₹{{ "{:,.2f}".format(t.amount) }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-icon">📝</span>
+        <p>No transactions yet. Start by adding your first one!</p>
+        <a href="{{ url_for('transactions.add_transaction') }}" class="btn btn-primary">+ Add Transaction</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Stats -->
+<div class="quick-stats">
+    <div class="quick-stat">
+        <span class="qs-value">{{ transaction_count }}</span>
+        <span class="qs-label">Total Transactions</span>
+    </div>
+    <div class="quick-stat">
+        <span class="qs-value">{{ accounts|length }}</span>
+        <span class="qs-label">Accounts</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    {% if category_labels %}
+    createDoughnutChart('categoryChart', {{ category_labels|tojson }}, {{ category_amounts|tojson }}, {{ category_colors|tojson }});
+    {% endif %}
+    createBarChart('trendChart', {{ month_labels|tojson }}, {{ month_incomes|tojson }}, {{ month_expenses|tojson }});
+</script>
+{% endblock %}

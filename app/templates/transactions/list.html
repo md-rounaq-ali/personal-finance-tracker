@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Transactions{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Transactions</h1>
+        <p class="page-subtitle">{{ pagination.total }} total record{{ 's' if pagination.total != 1 else '' }}</p>
+    </div>
+    <div class="header-actions">
+        <a href="{{ url_for('transactions.export_csv') }}" class="btn btn-outline" title="Export CSV">📥 Export CSV</a>
+        <a href="{{ url_for('transactions.add_transaction') }}" class="btn btn-primary">+ Add Transaction</a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card filter-card">
+    <form method="GET" class="filters-form" id="filtersForm">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Type</label>
+                <select name="type" onchange="this.form.submit()">
+                    <option value="">All Types</option>
+                    <option value="income" {% if filter_type == 'income' %}selected{% endif %}>Income</option>
+                    <option value="expense" {% if filter_type == 'expense' %}selected{% endif %}>Expense</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Category</label>
+                <select name="category" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if filter_category == cat.id|string %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Account</label>
+                <select name="account" onchange="this.form.submit()">
+                    <option value="">All Accounts</option>
+                    {% for acc in accounts %}
+                    <option value="{{ acc.id }}" {% if filter_account == acc.id|string %}selected{% endif %}>{{ acc.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>From</label>
+                <input type="date" name="date_from" value="{{ date_from }}" onchange="this.form.submit()">
+            </div>
+            <div class="filter-group">
+                <label>To</label>
+                <input type="date" name="date_to" value="{{ date_to }}" onchange="this.form.submit()">
+            </div>
+            <div class="filter-group">
+                <label>Search</label>
+                <input type="text" name="search" value="{{ search }}" placeholder="Description..." onchange="this.form.submit()">
+            </div>
+        </div>
+        {% if filter_type or filter_category or filter_account or date_from or date_to or search %}
+        <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-sm btn-ghost">✕ Clear Filters</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Transactions Table -->
+<div class="card">
+    {% if transactions %}
+    <div class="table-responsive">
+        <table class="data-table" id="transactionsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Account</th>
+                    <th class="text-right">Amount</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr class="fade-in">
+                    <td class="text-muted">{{ t.transaction_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ t.description or '—' }}</td>
+                    <td>
+                        {% if t.category %}
+                        <span class="category-badge" style="--cat-color: {{ t.category.color }}">
+                            {{ t.category.icon }} {{ t.category.name }}
+                        </span>
+                        {% else %}
+                        <span class="text-muted">Uncategorized</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">{{ t.account.name if t.account else '—' }}</td>
+                    <td class="text-right">
+                        <span class="amount {{ t.type }}">
+                            {{ '+' if t.type == 'income' else '-' }}₹{{ "{:,.2f}".format(t.amount) }}
+                        </span>
+                    </td>
+                    <td class="text-center actions-cell">
+                        <a href="{{ url_for('transactions.edit_transaction', id=t.id) }}" class="btn btn-sm btn-ghost" title="Edit">✏️</a>
+                        <form method="POST" action="{{ url_for('transactions.delete_transaction', id=t.id) }}" class="inline-form"
+                              onsubmit="return confirm('Delete this transaction?')">
+                            <button type="submit" class="btn btn-sm btn-ghost btn-danger" title="Delete">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <div class="pagination">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('transactions.list_transactions', page=pagination.prev_num, type=filter_type, category=filter_category, account=filter_account, date_from=date_from, date_to=date_to, search=search) }}" class="btn btn-sm btn-outline">← Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+        {% if pagination.has_next %}
+        <a href="{{ url_for('transactions.list_transactions', page=pagination.next_num, type=filter_type, category=filter_category, account=filter_account, date_from=date_from, date_to=date_to, search=search) }}" class="btn btn-sm btn-outline">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-icon">🔍</span>
+        <p>No transactions found{% if filter_type or filter_category or search %} matching your filters{% endif %}.</p>
+        <a href="{{ url_for('transactions.add_transaction') }}" class="btn btn-primary">+ Add Transaction</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

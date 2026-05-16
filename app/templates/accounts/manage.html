@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Accounts{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Accounts</h1>
+        <p class="page-subtitle">Total Balance: ₹{{ "{:,.2f}".format(total_balance) }}</p>
+    </div>
+</div>
+
+<!-- Add Account Form -->
+<div class="card form-card">
+    <h3 class="card-title">Add New Account</h3>
+    <form method="POST" action="{{ url_for('accounts.add') }}" class="inline-add-form">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Account Name</label>
+                <input type="text" name="name" required placeholder="e.g. HDFC Bank">
+            </div>
+            <div class="filter-group">
+                <label>Type</label>
+                <select name="type">
+                    <option value="bank">🏦 Bank Account</option>
+                    <option value="cash">💵 Cash</option>
+                    <option value="wallet">📱 Digital Wallet</option>
+                    <option value="credit_card">💳 Credit Card</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Opening Balance (₹)</label>
+                <input type="number" name="balance" step="0.01" value="0" min="0">
+            </div>
+            <div class="filter-group" style="align-self: flex-end;">
+                <button type="submit" class="btn btn-primary">+ Add</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Accounts Grid -->
+<div class="accounts-grid">
+    {% for acc in accounts %}
+    <div class="account-card fade-in">
+        <div class="account-header">
+            <span class="account-type-icon">
+                {% if acc.type == 'bank' %}🏦{% elif acc.type == 'cash' %}💵{% elif acc.type == 'wallet' %}📱{% else %}💳{% endif %}
+            </span>
+            <div>
+                <h3 class="account-name">{{ acc.name }}</h3>
+                <span class="account-type">{{ acc.type|replace('_', ' ')|title }}</span>
+            </div>
+        </div>
+        <div class="account-balance {% if acc.balance >= 0 %}positive{% else %}negative{% endif %}">
+            ₹{{ "{:,.2f}".format(acc.balance) }}
+        </div>
+        <div class="account-actions">
+            <form method="POST" action="{{ url_for('accounts.delete', id=acc.id) }}" class="inline-form"
+                  onsubmit="return confirm('Delete account &quot;{{ acc.name }}&quot;?')">
+                <button type="submit" class="btn btn-sm btn-ghost btn-danger">🗑️ Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not accounts %}
+<div class="card">
+    <div class="empty-state">
+        <span class="empty-icon">🏦</span>
+        <p>No accounts yet. Add one above to get started!</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Reports — {{ month_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Financial Report</h1>
+        <p class="page-subtitle">{{ month_name }}</p>
+    </div>
+    <!-- Month/Year Selector -->
+    <form method="GET" class="month-selector">
+        <select name="month" onchange="this.form.submit()">
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if sel_month == m %}selected{% endif %}>
+                {{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1] }}
+            </option>
+            {% endfor %}
+        </select>
+        <select name="year" onchange="this.form.submit()">
+            {% for y in years %}
+            <option value="{{ y }}" {% if sel_year == y %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<!-- Summary Cards -->
+<div class="stats-grid">
+    <div class="stat-card stat-income">
+        <div class="stat-icon">📥</div>
+        <div class="stat-info">
+            <span class="stat-label">Income</span>
+            <span class="stat-value">₹{{ "{:,.2f}".format(income) }}</span>
+        </div>
+    </div>
+    <div class="stat-card stat-expense">
+        <div class="stat-icon">📤</div>
+        <div class="stat-info">
+            <span class="stat-label">Expenses</span>
+            <span class="stat-value">₹{{ "{:,.2f}".format(expense) }}</span>
+        </div>
+    </div>
+    <div class="stat-card {% if savings >= 0 %}stat-positive{% else %}stat-negative{% endif %}">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+            <span class="stat-label">Savings</span>
+            <span class="stat-value">₹{{ "{:,.2f}".format(savings) }}</span>
+        </div>
+    </div>
+    <div class="stat-card stat-total">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+            <span class="stat-label">Savings Rate</span>
+            <span class="stat-value">{{ "%.1f"|format(savings_rate) }}%</span>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3 class="card-title">Category Breakdown</h3>
+        {% if cat_labels %}
+        <div class="chart-container">
+            <canvas id="reportCategoryChart"></canvas>
+        </div>
+        {% else %}
+        <div class="empty-state"><span class="empty-icon">🍩</span><p>No expenses this month</p></div>
+        {% endif %}
+    </div>
+    <div class="chart-card">
+        <h3 class="card-title">6-Month Comparison</h3>
+        <div class="chart-container">
+            <canvas id="reportCompChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Budget vs Actual -->
+{% if budget_data %}
+<div class="card">
+    <h3 class="card-title">📊 Budget vs Actual</h3>
+    <div class="budget-list">
+        {% for b in budget_data %}
+        <div class="budget-row">
+            <div class="budget-info">
+                <span>{{ b.icon }} {{ b.category }}</span>
+                <span class="budget-amounts">
+                    ₹{{ "{:,.0f}".format(b.spent) }} / ₹{{ "{:,.0f}".format(b.budget) }}
+                    {% if b.exceeded %}<span class="badge badge-danger">Over Budget</span>{% endif %}
+                </span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill {% if b.exceeded %}exceeded{% endif %}" style="width: {{ b.percentage }}%"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Set Budget -->
+<div class="card form-card">
+    <h3 class="card-title">Set Monthly Budget</h3>
+    <form method="POST" action="{{ url_for('reports.set_budget') }}" class="inline-add-form">
+        <input type="hidden" name="month" value="{{ sel_month }}">
+        <input type="hidden" name="year" value="{{ sel_year }}">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Category</label>
+                <select name="category_id" required>
+                    <option value="">Select category</option>
+                    {% for cat in expense_categories %}
+                    <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Budget Amount (₹)</label>
+                <input type="number" name="amount" step="100" min="100" required placeholder="5000">
+            </div>
+            <div class="filter-group" style="align-self: flex-end;">
+                <button type="submit" class="btn btn-primary">Set Budget</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Top Expenses -->
+{% if top_expenses %}
+<div class="card">
+    <h3 class="card-title">💸 Top 5 Expenses</h3>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead><tr><th>Date</th><th>Description</th><th>Category</th><th class="text-right">Amount</th></tr></thead>
+            <tbody>
+                {% for t in top_expenses %}
+                <tr>
+                    <td class="text-muted">{{ t.transaction_date.strftime('%d %b') }}</td>
+                    <td>{{ t.description or '—' }}</td>
+                    <td>
+                        {% if t.category %}
+                        <span class="category-badge" style="--cat-color: {{ t.category.color }}">{{ t.category.icon }} {{ t.category.name }}</span>
+                        {% else %}<span class="text-muted">—</span>{% endif %}
+                    </td>
+                    <td class="text-right"><span class="amount expense">-₹{{ "{:,.2f}".format(t.amount) }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="quick-stats">
+    <div class="quick-stat">
+        <span class="qs-value">{{ txn_count }}</span>
+        <span class="qs-label">Transactions This Month</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    {% if cat_labels %}
+    createDoughnutChart('reportCategoryChart', {{ cat_labels|tojson }}, {{ cat_amounts|tojson }}, {{ cat_colors|tojson }});
+    {% endif %}
+    createBarChart('reportCompChart', {{ comp_labels|tojson }}, {{ comp_incomes|tojson }}, {{ comp_expenses|tojson }});
+</script>
+{% endblock %}

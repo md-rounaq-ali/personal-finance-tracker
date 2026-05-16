@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Edit Transaction{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Edit Transaction</h1>
+        <p class="page-subtitle">Update transaction #{{ transaction.id }}</p>
+    </div>
+    <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-outline">← Back</a>
+</div>
+
+<div class="card form-card">
+    <form method="POST" class="transaction-form" id="editTransactionForm">
+        <div class="type-toggle">
+            <label class="type-option">
+                <input type="radio" name="type" value="expense" {% if transaction.type == 'expense' %}checked{% endif %}>
+                <span class="type-btn expense-btn">📤 Expense</span>
+            </label>
+            <label class="type-option">
+                <input type="radio" name="type" value="income" {% if transaction.type == 'income' %}checked{% endif %}>
+                <span class="type-btn income-btn">📥 Income</span>
+            </label>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="amount">Amount (₹) *</label>
+                <input type="number" id="amount" name="amount" step="0.01" min="0.01" required
+                       value="{{ transaction.amount }}" class="amount-input">
+            </div>
+            <div class="form-group">
+                <label for="transaction_date">Date *</label>
+                <input type="date" id="transaction_date" name="transaction_date"
+                       value="{{ transaction.transaction_date.isoformat() }}" required>
+            </div>
+            <div class="form-group">
+                <label for="category_id">Category</label>
+                <select id="category_id" name="category_id">
+                    <option value="">Select category</option>
+                    <optgroup label="── Income ──">
+                        {% for cat in categories if cat.type == 'income' %}
+                        <option value="{{ cat.id }}" {% if transaction.category_id == cat.id %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <optgroup label="── Expense ──">
+                        {% for cat in categories if cat.type == 'expense' %}
+                        <option value="{{ cat.id }}" {% if transaction.category_id == cat.id %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="account_id">Account *</label>
+                <select id="account_id" name="account_id" required>
+                    {% for acc in accounts %}
+                    <option value="{{ acc.id }}" {% if transaction.account_id == acc.id %}selected{% endif %}>{{ acc.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group full-width">
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description"
+                       value="{{ transaction.description }}" placeholder="What was this for?" maxlength="255">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">💾 Update Transaction</button>
+            <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
