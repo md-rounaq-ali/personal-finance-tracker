@@ -29,18 +29,16 @@
 
 ## 📸 Screenshots
 
-*(Add your screenshots here before pushing to GitHub. Recommended: Dashboard, Transactions List, and Monthly Report)*
-
 | Dashboard Overview | Monthly Analytics |
 | :---: | :---: |
-| <img src="docs/dashboard.png" width="400" alt="Dashboard Screenshot placeholder" /> | <img src="docs/reports.png" width="400" alt="Reports Screenshot placeholder" /> |
+| <img src="docs/dashboard.png" width="400" alt="Dashboard Overview" /> | <img src="docs/reports.png" width="400" alt="Monthly Analytics" /> |
 
 <br />
 
 ## 🚀 Live Demo
 
-**https://personal-finance-tracker-l1n2.onrender.com**  
-*(Replace the link above once you deploy the application to a platform like Render or PythonAnywhere).*
+You can interact with the live, production-deployed version of **FinTrack** here:  
+👉 **[FinTrack Live Demo](https://personal-finance-tracker-l1n2.onrender.com)**
 
 ---
 
@@ -93,7 +91,7 @@ Follow these steps to run the project locally on your machine.
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/personal-finance-tracker.git
+git clone https://github.com/md-rounaq-ali/personal-finance-tracker.git
 cd personal-finance-tracker
 ```
 
