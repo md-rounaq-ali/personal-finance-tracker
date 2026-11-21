@@ -242,4 +242,4 @@ tests/test_transactions.py::test_account_to_account_transfer PASSED
 ## 📄 License
 This project is open-source and released under the [MIT License](LICENSE).
 <br />
-© 2026 NexBrief. All rights reserved. Developed by [Md Rounaq Ali](https://md-rounaq-ali.netlify.app/).
+© 2026 FinTrack. All rights reserved. Developed by [Md Rounaq Ali](https://md-rounaq-ali.netlify.app/).

@@ -8,7 +8,7 @@ def test_landing_page_unauthenticated(client):
     assert b'FinTrack' in response.data
     assert b'Md Rounaq Ali' in response.data
     assert b'Master Your Money' in response.data
-    assert b'NexBrief' in response.data
+    assert b'All rights reserved' in response.data
     assert b'md-rounaq-ali.netlify.app' in response.data
 
 
