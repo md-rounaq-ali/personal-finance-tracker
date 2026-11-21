@@ -28,7 +28,7 @@ def send_via_brevo_http(to_email, subject, html_content, text_content=None):
     Send email via Brevo HTTP API (Port 443 / HTTPS).
     Never blocked by cloud hosts like Render. Free 300 emails/day.
     """
-    api_key = os.environ.get('BREVO_API_KEY', '').strip()
+    api_key = os.environ.get('BREVO_API_KEY', '').strip().strip('"').strip("'")
     if not api_key:
         return False, "BREVO_API_KEY not configured"
 
@@ -64,6 +64,8 @@ def send_via_brevo_http(to_email, subject, html_content, text_content=None):
             return False, f"Brevo HTTP error: {response.status}"
     except urllib.error.HTTPError as e:
         err_body = e.read().decode('utf-8') if e.fp else str(e)
+        if "Key not found" in err_body or e.code == 401:
+            return False, "Brevo API Key not found or unauthorized. In Brevo, open the 'API Keys' tab (not SMTP tab), generate a key (starts with 'xkeysib-'), and verify your Brevo email."
         return False, f"Brevo API error: {err_body}"
     except Exception as e:
         return False, f"Brevo connection error: {str(e)}"
