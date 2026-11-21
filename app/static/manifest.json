@@ -1,0 +1,25 @@
+{
+  "name": "FinTrack — Personal Finance Tracker",
+  "short_name": "FinTrack",
+  "description": "Intelligent personal finance and budget tracking engineered by Md Rounaq Ali",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#0b1120",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/static/img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/fintrack_logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

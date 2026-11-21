@@ -450,31 +450,132 @@ a:hover { color: var(--accent-hover); }
 .fade-in:nth-child(4) { animation-delay: 0.15s; }
 .fade-in:nth-child(5) { animation-delay: 0.2s; }
 
-/* --- Responsive --- */
-@media (max-width: 768px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open { transform: translateX(0); }
-    .sidebar-overlay.show { display: block; }
-    .mobile-header { display: flex; }
-    .main-content { margin-left: 0; padding: 72px 16px 32px; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .charts-grid { grid-template-columns: 1fr; }
-    .form-grid { grid-template-columns: 1fr; }
-    .filter-row { flex-direction: column; }
-    .filter-group { width: 100%; }
-    .page-header { flex-direction: column; align-items: flex-start; }
-    .header-actions { width: 100%; }
-    .quick-stats { flex-direction: column; }
-    .type-toggle { flex-direction: column; }
-    .month-selector { width: 100%; }
-    .month-selector select { flex: 1; }
-    .accounts-grid { grid-template-columns: 1fr; }
-    .chart-container { height: 220px; }
+/* --- Touch & Platform Accessibility --- */
+html, body {
+    overflow-x: hidden;
+    touch-action: manipulation;
+}
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
+/* --- Large Screens / Ultra-Wide Constraints (1440px+) --- */
+@media (min-width: 1440px) {
+    .main-content {
+        max-width: 1440px;
+    }
+}
+
+/* --- Tablets & iPads (1024px and below) --- */
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .sidebar-overlay.show {
+        display: block;
+    }
+    .mobile-header {
+        display: flex;
+        padding-top: max(14px, env(safe-area-inset-top));
+    }
+    .main-content {
+        margin-left: 0;
+        padding: calc(72px + env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .accounts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* --- Mobile Landscape & Standard Smartphones (768px and below) --- */
+@media (max-width: 768px) {
+    /* Prevent iOS Safari 16px auto-zoom quirk on input focus */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+    .btn, .nav-link, button {
+        min-height: 44px; /* Apple & Android touch target recommendation */
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-group {
+        width: 100%;
+    }
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .header-actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .quick-stats {
+        flex-direction: column;
+    }
+    .type-toggle {
+        flex-direction: column;
+    }
+    .month-selector {
+        width: 100%;
+    }
+    .month-selector select {
+        flex: 1;
+    }
+    .accounts-grid {
+        grid-template-columns: 1fr;
+    }
+    .chart-container {
+        height: 240px;
+    }
+}
+
+/* --- Small Mobile Screens (480px and below) --- */
 @media (max-width: 480px) {
-    .stats-grid { grid-template-columns: 1fr; }
-    .auth-card { padding: 28px 20px; }
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .stat-card {
+        padding: 16px;
+    }
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    .auth-card {
+        padding: 24px 18px;
+        margin: 16px 12px;
+        border-radius: 14px;
+    }
+    .preview-stat-card {
+        padding: 12px;
+    }
+    .preview-stat-value {
+        font-size: 1.15rem;
+    }
 }
 
 /* Scrollbar */

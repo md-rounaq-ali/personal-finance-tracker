@@ -33,8 +33,15 @@
     <meta name="twitter:description" content="Personal finance and budgeting made simple, secure, and beautiful. Built by Md Rounaq Ali.">
     <meta name="twitter:image" content="https://personal-finance-tracker-l1n2.onrender.com/static/img/og_banner.jpg">
 
-    <!-- Favicon -->
+    <!-- Favicon & PWA Mobile App Support -->
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0b1120">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinTrack">
+    <meta name="format-detection" content="telephone=no">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -3,13 +3,41 @@
    Chart.js rendering, animations, interactions
    ============================================================ */
 
-// --- Sidebar Toggle (Mobile) ---
+// --- Sidebar Toggle (Mobile & Tablet) ---
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
+    if (!sidebar || !overlay) return;
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');
 }
+
+// Close sidebar on ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('show');
+        }
+    }
+});
+
+// Auto-close sidebar on mobile/tablet when a nav link is tapped
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                if (sidebar) sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+    });
+});
 
 // --- Flash Messages Auto-dismiss ---
 document.addEventListener('DOMContentLoaded', () => {
