@@ -1,5 +1,5 @@
 """
-Email & OTP Verification Service — Secure token generation & SMTP delivery
+Email & OTP Verification Service — Secure token generation & resilient SMTP delivery
 """
 import os
 import smtplib
@@ -21,45 +21,66 @@ def generate_otp(length=6):
 
 def send_smtp_email(to_email, subject, html_content, text_content=None):
     """
-    Send an email via SMTP.
+    Send an email via SMTP with automatic dual-port fallback (Port 587 TLS -> Port 465 SSL).
+    Sanitizes spaces and quotes from credentials automatically.
     Returns (True, None) on success, or (False, error_message) on failure.
     """
-    mail_server = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-    mail_port = int(os.environ.get('MAIL_PORT', 587))
-    mail_username = os.environ.get('MAIL_USERNAME')
-    mail_password = os.environ.get('MAIL_PASSWORD')
-    mail_sender = os.environ.get('MAIL_DEFAULT_SENDER', mail_username or 'FinTrack <noreply@fintrack.app>')
+    # Fast path for automated testing
+    if current_app and current_app.config.get('TESTING'):
+        return True, None
+
+    mail_server = os.environ.get('MAIL_SERVER', 'smtp.gmail.com').strip()
+    mail_username = os.environ.get('MAIL_USERNAME', '').strip().strip('"').strip("'")
+    raw_password = os.environ.get('MAIL_PASSWORD', '').strip().strip('"').strip("'")
+    # Google App Passwords often have spaces (e.g. 'rwqa qrow fhmm xodm') -> strip spaces for SMTP
+    mail_password = raw_password.replace(' ', '')
+    mail_sender = os.environ.get('MAIL_DEFAULT_SENDER', '').strip().strip('"').strip("'") or f"FinTrack Security <{mail_username}>"
 
     if not mail_username or not mail_password:
-        return False, "SMTP credentials (MAIL_USERNAME / MAIL_PASSWORD) not configured in environment."
+        return False, "SMTP credentials missing: Please set MAIL_USERNAME and MAIL_PASSWORD in Render Environment."
 
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = subject
+    msg['From'] = mail_sender
+    msg['To'] = to_email
+
+    if text_content:
+        msg.attach(MIMEText(text_content, 'plain'))
+    msg.attach(MIMEText(html_content, 'html'))
+
+    err587_str = "Not attempted"
+    # Attempt 1: Port 587 with STARTTLS
     try:
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = mail_sender
-        msg['To'] = to_email
-
-        if text_content:
-            msg.attach(MIMEText(text_content, 'plain'))
-        msg.attach(MIMEText(html_content, 'html'))
-
-        with smtplib.SMTP(mail_server, mail_port, timeout=10) as server:
+        with smtplib.SMTP(mail_server, 587, timeout=12) as server:
             server.ehlo()
             server.starttls()
             server.ehlo()
             server.login(mail_username, mail_password)
             server.send_message(msg)
-
         return True, None
-    except Exception as e:
-        return False, str(e)
+    except Exception as err587:
+        err587_str = str(err587)
+        if current_app:
+            current_app.logger.warning(f"SMTP Port 587 attempt failed: {err587_str}. Retrying on Port 465 (SSL)...")
+
+    # Attempt 2: Port 465 with direct SSL (often more reliable on cloud providers)
+    try:
+        with smtplib.SMTP_SSL(mail_server, 465, timeout=12) as server:
+            server.login(mail_username, mail_password)
+            server.send_message(msg)
+        return True, None
+    except Exception as err465:
+        error_msg = f"Email delivery failed (Port 587: {err587_str} | Port 465: {err465})"
+        if current_app:
+            current_app.logger.error(error_msg)
+        return False, error_msg
 
 
 def create_and_send_otp(email, purpose='register'):
     """
     Creates an OTP in the database and dispatches it via email.
     purpose: 'register' or 'forgot_password'
-    Returns: (bool_success, dev_otp_or_none)
+    Returns: (bool_success, error_or_dev_otp)
     """
     email = email.strip().lower()
 
@@ -140,13 +161,16 @@ def create_and_send_otp(email, purpose='register'):
         text_content=text_content
     )
 
+    # In production (e.g. on Render), NEVER display the OTP on screen!
+    is_testing = current_app.config.get('TESTING', False)
+    is_local_dev = (os.environ.get('FLASK_DEBUG') == '1') and (not os.environ.get('RENDER'))
+
     if not sent:
-        # Fallback for dev/testing when SMTP is not configured
-        print(f"\n==================================================")
-        print(f"[FinTrack DEV MODE] OTP Code for {email} ({purpose}): {otp_code}")
-        print(f"SMTP Status: {error}")
-        print(f"==================================================\n")
-        return True, otp_code
+        if is_testing or is_local_dev:
+            print(f"\n[FinTrack DEV LOCAL] OTP for {email}: {otp_code} (Reason: {error})")
+            return True, otp_code
+        # In production: Fail securely and do NOT leak the OTP
+        return False, error
 
     return True, None
 

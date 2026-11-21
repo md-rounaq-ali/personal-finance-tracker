@@ -97,9 +97,13 @@ def register():
         }
 
         # Send 6-digit verification OTP
-        _, dev_otp = create_and_send_otp(email, purpose='register')
-        if dev_otp:
-            flash(f"Verification code sent! (Dev Mode OTP: {dev_otp})", 'info')
+        success, dev_or_err = create_and_send_otp(email, purpose='register')
+        if not success:
+            flash(f"Could not send email: {dev_or_err}. Please check your email settings.", 'error')
+            return render_template('auth/register.html')
+
+        if dev_or_err:
+            flash(f"Verification code sent! (Local Dev OTP: {dev_or_err})", 'info')
         else:
             flash(f"A 6-digit verification code has been sent to {email}. Please check your inbox.", 'info')
 
@@ -180,9 +184,11 @@ def resend_otp():
         flash('Session expired. Please restart the request.', 'error')
         return redirect(url_for('auth.login'))
 
-    _, dev_otp = create_and_send_otp(email, purpose=purpose)
-    if dev_otp:
-        flash(f"A new verification code was generated! (Dev Mode OTP: {dev_otp})", 'info')
+    success, dev_or_err = create_and_send_otp(email, purpose=purpose)
+    if not success:
+        flash(f"Could not deliver code: {dev_or_err}", 'error')
+    elif dev_or_err:
+        flash(f"A new verification code was generated! (Local Dev OTP: {dev_or_err})", 'info')
     else:
         flash(f"A new verification code was sent to {email}.", 'success')
 
@@ -203,9 +209,13 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
         if user:
             session['reset_password_email'] = email
-            _, dev_otp = create_and_send_otp(email, purpose='forgot_password')
-            if dev_otp:
-                flash(f"Password reset code generated! (Dev Mode OTP: {dev_otp})", 'info')
+            success, dev_or_err = create_and_send_otp(email, purpose='forgot_password')
+            if not success:
+                flash(f"Could not send email: {dev_or_err}", 'error')
+                return render_template('auth/forgot_password.html')
+
+            if dev_or_err:
+                flash(f"Password reset code generated! (Local Dev OTP: {dev_or_err})", 'info')
             else:
                 flash(f"A 6-digit password reset code has been sent to {email}.", 'info')
             return redirect(url_for('auth.reset_password'))
