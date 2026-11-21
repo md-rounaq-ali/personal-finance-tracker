@@ -38,6 +38,10 @@
                 <span class="nav-icon">📈</span>
                 <span class="nav-text">Reports</span>
             </a>
+            <a href="{{ url_for('budgets.manage') }}" class="nav-link {% if request.endpoint and 'budgets' in request.endpoint %}active{% endif %}">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-text">Budgets</span>
+            </a>
         </nav>
         <div class="sidebar-footer">
             <div class="user-info">

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>400 — Bad Request | FinTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card" style="text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🛡️</div>
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #f59e0b; margin-bottom: 0.5rem;">400</h1>
+            <h2 style="font-size: 1.25rem; color: #94a3b8; font-weight: 500; margin-bottom: 1.5rem;">Bad Request / Session Expired</h2>
+            <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 2rem;">
+                Your security token has expired or the request could not be validated. Please refresh the page and try again.
+            </p>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-full">
+                ← Return to Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

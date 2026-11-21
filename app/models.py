@@ -1,15 +1,19 @@
 """
 Database Models — User, Category, Account, Transaction, Budget
 """
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db, login_manager
 
 
+def utc_now():
+    return datetime.now(timezone.utc)
+
+
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 
 class User(UserMixin, db.Model):
@@ -20,7 +24,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     currency = db.Column(db.String(5), default='₹')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     # Relationships
     categories = db.relationship('Category', backref='user', lazy='dynamic', cascade='all, delete-orphan')
@@ -64,7 +68,7 @@ class Account(db.Model):
     name = db.Column(db.String(50), nullable=False)
     type = db.Column(db.Enum('cash', 'bank', 'credit_card', 'wallet', name='account_type'), default='bank')
     balance = db.Column(db.Numeric(15, 2), default=0.00)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     # Relationships
     transactions = db.relationship('Transaction', backref='account', lazy='dynamic')
@@ -84,7 +88,7 @@ class Transaction(db.Model):
     type = db.Column(db.Enum('income', 'expense', name='transaction_type'), nullable=False)
     description = db.Column(db.String(255), default='')
     transaction_date = db.Column(db.Date, default=date.today, index=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     def __repr__(self):
         return f'<Transaction {self.type}: ₹{self.amount}>'
@@ -99,7 +103,7 @@ class Budget(db.Model):
     amount = db.Column(db.Numeric(15, 2), nullable=False)
     month = db.Column(db.Integer, nullable=False)  # 1-12
     year = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     __table_args__ = (
         db.UniqueConstraint('user_id', 'category_id', 'month', 'year', name='uq_budget_per_category_month'),

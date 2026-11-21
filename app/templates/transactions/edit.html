@@ -12,6 +12,7 @@
 
 <div class="card form-card">
     <form method="POST" class="transaction-form" id="editTransactionForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="type-toggle">
             <label class="type-option">
                 <input type="radio" name="type" value="expense" {% if transaction.type == 'expense' %}checked{% endif %}>

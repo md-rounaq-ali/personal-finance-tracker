@@ -4,41 +4,86 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">Accounts</h1>
-        <p class="page-subtitle">Total Balance: ₹{{ "{:,.2f}".format(total_balance) }}</p>
+        <h1 class="page-title">Accounts & Transfers</h1>
+        <p class="page-subtitle">Total Net Worth: ₹{{ "{:,.2f}".format(total_balance) }}</p>
     </div>
 </div>
 
-<!-- Add Account Form -->
-<div class="card form-card">
-    <h3 class="card-title">Add New Account</h3>
-    <form method="POST" action="{{ url_for('accounts.add') }}" class="inline-add-form">
-        <div class="filter-row">
-            <div class="filter-group">
+<div class="grid-2col" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Add Account Form -->
+    <div class="card form-card">
+        <h3 class="card-title">🏦 Add New Account</h3>
+        <form method="POST" action="{{ url_for('accounts.add') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group" style="margin-bottom: 1rem;">
                 <label>Account Name</label>
-                <input type="text" name="name" required placeholder="e.g. HDFC Bank">
+                <input type="text" name="name" required placeholder="e.g. HDFC Bank, Cash Wallet" maxlength="50">
             </div>
-            <div class="filter-group">
-                <label>Type</label>
-                <select name="type">
-                    <option value="bank">🏦 Bank Account</option>
-                    <option value="cash">💵 Cash</option>
-                    <option value="wallet">📱 Digital Wallet</option>
-                    <option value="credit_card">💳 Credit Card</option>
-                </select>
+            <div class="form-row" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Type</label>
+                    <select name="type">
+                        <option value="bank">🏦 Bank Account</option>
+                        <option value="cash">💵 Cash</option>
+                        <option value="wallet">📱 Digital Wallet</option>
+                        <option value="credit_card">💳 Credit Card</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Opening Balance (₹)</label>
+                    <input type="number" name="balance" step="0.01" value="0" min="0">
+                </div>
             </div>
-            <div class="filter-group">
-                <label>Opening Balance (₹)</label>
-                <input type="number" name="balance" step="0.01" value="0" min="0">
+            <button type="submit" class="btn btn-primary btn-full">+ Create Account</button>
+        </form>
+    </div>
+
+    <!-- Account Transfer Form -->
+    {% if accounts|length >= 2 %}
+    <div class="card form-card">
+        <h3 class="card-title">🔄 Transfer Between Accounts</h3>
+        <form method="POST" action="{{ url_for('transactions.transfer') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-row" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label>From Account</label>
+                    <select name="from_account_id" required>
+                        {% for acc in accounts %}
+                        <option value="{{ acc.id }}">{{ acc.name }} (₹{{ "{:,.2f}".format(acc.balance) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>To Account</label>
+                    <select name="to_account_id" required>
+                        {% for acc in accounts %}
+                        <option value="{{ acc.id }}" {% if loop.index == 2 %}selected{% endif %}>{{ acc.name }} (₹{{ "{:,.2f}".format(acc.balance) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-            <div class="filter-group" style="align-self: flex-end;">
-                <button type="submit" class="btn btn-primary">+ Add</button>
+            <div class="form-row" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Amount (₹)</label>
+                    <input type="number" name="amount" step="0.01" min="0.01" required placeholder="0.00">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Date</label>
+                    <input type="date" name="transaction_date" value="{{ current_year }}-01-01" id="transferDate">
+                </div>
             </div>
-        </div>
-    </form>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label>Notes (Optional)</label>
+                <input type="text" name="description" placeholder="e.g. ATM withdrawal, Credit Card Bill">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Transfer Funds</button>
+        </form>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Accounts Grid -->
+<h3 class="card-title" style="margin-bottom: 1rem;">Active Accounts</h3>
 <div class="accounts-grid">
     {% for acc in accounts %}
     <div class="account-card fade-in">
@@ -57,6 +102,7 @@
         <div class="account-actions">
             <form method="POST" action="{{ url_for('accounts.delete', id=acc.id) }}" class="inline-form"
                   onsubmit="return confirm('Delete account &quot;{{ acc.name }}&quot;?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-sm btn-ghost btn-danger">🗑️ Delete</button>
             </form>
         </div>
@@ -72,4 +118,12 @@
     </div>
 </div>
 {% endif %}
+
+<script>
+    // Default transfer date to today
+    const transferDateInput = document.getElementById('transferDate');
+    if (transferDateInput) {
+        transferDateInput.value = new Date().toISOString().split('T')[0];
+    }
+</script>
 {% endblock %}

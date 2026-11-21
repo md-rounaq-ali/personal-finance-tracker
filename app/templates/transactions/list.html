@@ -101,6 +101,7 @@
                         <a href="{{ url_for('transactions.edit_transaction', id=t.id) }}" class="btn btn-sm btn-ghost" title="Edit">✏️</a>
                         <form method="POST" action="{{ url_for('transactions.delete_transaction', id=t.id) }}" class="inline-form"
                               onsubmit="return confirm('Delete this transaction?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="btn btn-sm btn-ghost btn-danger" title="Delete">🗑️</button>
                         </form>
                     </td>

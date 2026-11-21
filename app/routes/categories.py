@@ -1,5 +1,5 @@
 """
-Category Management Routes
+Category Management Routes — Full CRUD with IDOR Protection
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
@@ -30,13 +30,15 @@ def manage():
 def add():
     name = request.form.get('name', '').strip()
     cat_type = request.form.get('type', 'expense')
-    icon = request.form.get('icon', '📦').strip()
-    color = request.form.get('color', '#14b8a6')
+    icon = request.form.get('icon', '📦').strip() or '📦'
+    color = request.form.get('color', '#14b8a6').strip() or '#14b8a6'
 
     if not name:
         flash('Category name is required.', 'error')
     elif len(name) > 50:
         flash('Category name must be 50 characters or less.', 'error')
+    elif cat_type not in ('income', 'expense'):
+        flash('Invalid category type.', 'error')
     else:
         existing = Category.query.filter_by(
             user_id=current_user.id, name=name, type=cat_type
@@ -64,7 +66,7 @@ def delete(id):
     category = Category.query.filter_by(id=id, user_id=current_user.id).first_or_404()
 
     # Check if category has transactions
-    txn_count = Transaction.query.filter_by(category_id=id).count()
+    txn_count = Transaction.query.filter_by(category_id=id, user_id=current_user.id).count()
     if txn_count > 0:
         flash(f'Cannot delete "{category.name}" — it has {txn_count} transaction(s). Reassign them first.', 'error')
     else:

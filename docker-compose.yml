@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: fintrack-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: personal_finance_tracker
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+
+  web:
+    build: .
+    container_name: fintrack-web
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - FLASK_APP=run.py
+      - SECRET_KEY=fintrack-docker-secret-key-3918a7c6
+      - DATABASE_URL=mysql+pymysql://root:rootpassword@db:3306/personal_finance_tracker?charset=utf8mb4
+    ports:
+      - "5000:5000"
+
+volumes:
+  mysql_data:

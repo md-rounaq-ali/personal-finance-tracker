@@ -1,16 +1,18 @@
 <div align="center">
   
-  # 💰 FinTrack — Premium Personal Finance Tracker
+  # 💰 FinTrack — Enterprise Personal Finance Tracker
 
   <p align="center">
-    A full-stack, enterprise-grade personal finance management application built with Python, Flask, and MySQL.
+    A full-stack, production-grade personal finance management web application & REST API built with Python, Flask, SQLAlchemy, and MySQL.
   </p>
 
   <!-- Badges -->
   <p align="center">
-    <img src="https://img.shields.io/badge/Python-3.8+-blue.svg" alt="Python Version" />
+    <img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python Version" />
     <img src="https://img.shields.io/badge/Flask-3.1.1-lightgrey.svg" alt="Flask Version" />
     <img src="https://img.shields.io/badge/MySQL-8.0+-orange.svg" alt="MySQL Version" />
+    <img src="https://img.shields.io/badge/Security-CSRF%20%26%20IDOR%20Protected-brightgreen.svg" alt="Security" />
+    <img src="https://img.shields.io/badge/Tests-Pytest%20100%25%20Passing-success.svg" alt="Tests" />
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License" />
   </p>
 
@@ -19,9 +21,13 @@
     <span> | </span>
     <a href="#features">Features</a>
     <span> | </span>
-    <a href="#tech-stack">Tech Stack</a>
+    <a href="#rest-api">REST API</a>
     <span> | </span>
-    <a href="#installation">Installation</a>
+    <a href="#security--architecture">Security</a>
+    <span> | </span>
+    <a href="#installation--docker">Setup & Docker</a>
+    <span> | </span>
+    <a href="#testing">Tests</a>
   </h3>
 </div>
 
@@ -42,120 +48,134 @@ You can interact with the live, production-deployed version of **FinTrack** here
 
 ---
 
-## 📖 Project Description
+## 📖 Project Overview
 
-FinTrack is designed to provide users with complete control over their financial health. Moving beyond simple spreadsheet tracking, this application implements a fully normalized relational database to ensure data integrity while offering a stunning, premium dark-mode user interface. 
+FinTrack is an enterprise-grade financial management system designed for maximum security, real-time analytics, and high-precision financial tracking. Moving beyond simple spreadsheet tools, this application implements a fully normalized relational database, zero floating-point rounding errors through **Python `Decimal` arithmetic**, and strict **IDOR & CSRF defense mechanisms**.
 
-It was built focusing on **clean code architecture**, utilizing the **Flask Application Factory pattern**, secure user authentication, and advanced SQL querying for real-time financial aggregations.
+The project is built on the **Flask Application Factory pattern** with modular Blueprints, an automated **Pytest** test suite, continuous integration (**GitHub Actions CI**), and complete containerization (**Docker & Docker Compose**).
 
 ---
 
 ## ✨ Features
 
-- **📊 Real-time Dashboard**: Interactive summaries of income, expenses, net savings, and category-wise spending using Chart.js.
-- **🛡️ Secure Authentication**: User registration and login flows protected by Werkzeug password hashing and Flask-Login session management.
-- **💳 Multi-Account Tracking**: Manage balances across multiple entities (Bank Accounts, Credit Cards, Digital Wallets, Cash).
-- **🏷️ Smart Categorization**: 14+ default categories auto-seeded for new users, with support for custom user-defined categories featuring emojis and hex color codes.
-- **🎯 Budget Alerts**: Set monthly spending limits per category. Visual progress bars warn users as they approach or exceed their budgets.
-- **📉 Advanced Reporting**: Generate month-over-month comparisons, identify top expenses, and calculate overall savings rates.
-- **📥 CSV Data Export**: Instantly export your transaction history for external accounting or tax purposes.
+- **📊 Real-time Dashboard**: Interactive summaries of income, expenses, net savings, and category-wise spending using Chart.js with optimized $O(1)$ grouped SQL queries.
+- **🔄 Account-to-Account Transfers**: Atomically transfer funds between accounts (e.g. Bank to Cash or Wallet) without distorting income/expense analytics.
+- **🎯 Dedicated Budget Planner**: Set category thresholds with real-time visual spend progress bars, warning flags (>80%), and over-budget alerts.
+- **🛡️ Enterprise Security**: Protected by CSRF tokens on all POST endpoints, Flask-Limiter brute-force protection, and strict Insecure Direct Object Reference (IDOR) checks.
+- **💳 Multi-Account Net Worth Tracking**: Monitor balances across Bank Accounts, Credit Cards, Cash, and Digital Wallets.
+- **🏷️ Smart Categorization**: 14+ default categories auto-seeded with 4-byte UTF-8 emoji and custom hex palette support.
+- **📉 Financial Reporting**: Month-over-month comparisons, top 5 expenses, and automated savings rate calculations.
+- **📥 CSV Data Export**: Export filtered transaction logs with custom timestamps for external audits and accounting.
+- **🔌 RESTful JSON API**: Programmatic `/api/v1/` endpoints for headless integrations and mobile clients.
+
+---
+
+## 🔌 REST API Endpoints
+
+FinTrack includes a decoupled REST API blueprint (`/api/v1`) exempt from CSRF tokens for seamless programmatic integration:
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/health` | System and database connectivity health check | No |
+| `GET` | `/api/v1/summary` | Monthly financial aggregations and account balances | Yes |
+| `GET` | `/api/v1/transactions` | Paginated transaction history with optional filters | Yes |
+| `GET` | `/api/v1/categories` | User-defined category listing with metadata | Yes |
+
+---
+
+## 🛡️ Security & Architecture
+
+1. **CSRF Token Validation**: Enforced globally across all state-mutating requests via `Flask-WTF`.
+2. **IDOR Mitigation**: All database operations verify resource ownership against `current_user.id` to prevent unauthorized cross-account modifications.
+3. **High-Precision Currency Math**: Uses Python's `Decimal` alongside MySQL's `NUMERIC(15, 2)` to eliminate binary floating-point rounding errors.
+4. **Rate Limiting**: Defends authentication endpoints against dictionary attacks using `Flask-Limiter`.
+5. **Modern SQL Performance**: Eliminates N+1 query patterns using indexed multi-column `GROUP BY` aggregations.
+6. **Branded Dark-Mode Error Handling**: Custom error pages for `400 Bad Request`, `403 Forbidden`, `404 Not Found`, `429 Rate Limit`, and `500 Server Error`.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Core**: Python 3
+- **Language**: Python 3.11+
 - **Framework**: Flask (Application Factory, Blueprints)
-- **Database**: MySQL 8.0+
-- **ORM**: SQLAlchemy
-- **Migrations**: Flask-Migrate (Alembic)
-- **Security**: Flask-Login, Werkzeug Security, python-dotenv
+- **Database & ORM**: MySQL 8.0+, SQLAlchemy, Flask-Migrate (Alembic)
+- **Security**: Flask-Login, Flask-WTF (CSRF), Flask-Limiter, Werkzeug Security
+- **Server**: Gunicorn WSGI
 
 ### Frontend
-- **Structure**: HTML5, Jinja2 Templating
-- **Styling**: Vanilla CSS3 (Custom Dark-Mode Design System, CSS Variables, Glassmorphism)
-- **Interactivity**: Vanilla JavaScript
-- **Data Visualization**: Chart.js
+- **Templating**: Jinja2, HTML5
+- **Styling**: Vanilla CSS3 (Custom Dark Theme, Glassmorphism, CSS Grid & Flexbox)
+- **Interactivity**: Vanilla JavaScript, Chart.js
+
+### DevOps & Testing
+- **Testing**: Pytest, Pytest-Flask
+- **CI/CD**: GitHub Actions
+- **Containers**: Docker, Docker Compose
 
 ---
 
-## ⚙️ Installation & Local Setup
+## ⚙️ Installation & Setup
 
-Follow these steps to run the project locally on your machine.
-
-### 1. Prerequisites
-- Python 3.8 or higher installed.
-- MySQL Server installed and running locally.
-- Git installed.
-
-### 2. Clone the Repository
+### Option A: Running with Docker (Recommended)
+You can launch both the web application and MySQL container with a single command:
 ```bash
-git clone https://github.com/md-rounaq-ali/personal-finance-tracker.git
-cd personal-finance-tracker
+docker compose up --build
 ```
-
-### 3. Database Configuration
-Log into your MySQL server and create a new database:
-```sql
-CREATE DATABASE personal_finance_tracker;
-```
-
-### 4. Environment Setup
-Create a virtual environment and install the required dependencies:
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On Mac/Linux:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### 5. Environment Variables
-Create a `.env` file in the root directory and add your MySQL credentials:
-```env
-FLASK_APP=run.py
-FLASK_DEBUG=1
-SECRET_KEY=your_secure_secret_key_here
-DATABASE_URL=mysql+pymysql://root:YOUR_MYSQL_PASSWORD@localhost:3306/personal_finance_tracker
-```
-
-### 6. Run Database Migrations
-Initialize the tables in your MySQL database:
-```bash
-flask db init
-flask db migrate -m "Initial schema setup"
-flask db upgrade
-```
-
-### 7. Start the Server
-```bash
-python run.py
-```
-The application will be available at `http://127.0.0.1:5000`.
+The application will be live at `http://localhost:5000`.
 
 ---
 
-## 🗄️ Database Schema (ERD)
+### Option B: Local Setup
 
-The application uses a robust relational model designed to prevent data anomalies:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/md-rounaq-ali/personal-finance-tracker.git
+   cd personal-finance-tracker
+   ```
 
-- **Users Table**: Manages authentication and preferences.
-- **Categories Table**: Defines income/expense types, linked via Foreign Key to Users.
-- **Accounts Table**: Tracks balances for different financial sources.
-- **Transactions Table**: The core fact table linking Users, Accounts, and Categories. Ensures full auditability.
-- **Budgets Table**: Manages monthly threshold limits.
+2. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv venv
+   # Windows:
+   venv\Scripts\activate
+   # Linux/macOS:
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   FLASK_APP=run.py
+   SECRET_KEY=your_secret_key_here
+   DATABASE_URL=mysql+pymysql://root:password@localhost:3306/personal_finance_tracker?charset=utf8mb4
+   ```
+
+5. **Run database migrations:**
+   ```bash
+   flask db upgrade
+   ```
+
+6. **Start development server:**
+   ```bash
+   python run.py
+   ```
 
 ---
 
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](#).
+## 🧪 Testing
+
+Run the automated test suite covering models, authentication, transaction math, and API endpoints:
+```bash
+pytest tests/ -v
+```
+
+---
 
 ## 📄 License
-This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
+This project is licensed under the [MIT License](LICENSE).

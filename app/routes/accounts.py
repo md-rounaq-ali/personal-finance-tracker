@@ -1,6 +1,7 @@
 """
-Account Management Routes
+Account Management Routes — Full CRUD with IDOR Protection & High Precision Balance
 """
+from decimal import Decimal, InvalidOperation
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app import db
@@ -13,8 +14,8 @@ accounts_bp = Blueprint('accounts', __name__)
 @login_required
 def manage():
     accounts = Account.query.filter_by(user_id=current_user.id).order_by(Account.name).all()
-    total_balance = sum(float(a.balance) for a in accounts)
-    return render_template('accounts/manage.html', accounts=accounts, total_balance=total_balance)
+    total_balance = sum((Decimal(str(a.balance or 0)) for a in accounts), Decimal('0'))
+    return render_template('accounts/manage.html', accounts=accounts, total_balance=float(total_balance))
 
 
 @accounts_bp.route('/accounts/add', methods=['POST'])
@@ -22,10 +23,18 @@ def manage():
 def add():
     name = request.form.get('name', '').strip()
     acc_type = request.form.get('type', 'bank')
-    initial_balance = request.form.get('balance', 0, type=float)
+    balance_raw = request.form.get('balance', '0').strip()
+
+    try:
+        initial_balance = Decimal(balance_raw)
+    except (InvalidOperation, ValueError):
+        flash('Initial balance must be a valid number.', 'error')
+        return redirect(url_for('accounts.manage'))
 
     if not name:
         flash('Account name is required.', 'error')
+    elif len(name) > 50:
+        flash('Account name cannot exceed 50 characters.', 'error')
     else:
         existing = Account.query.filter_by(user_id=current_user.id, name=name).first()
         if existing:

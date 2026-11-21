@@ -103,6 +103,7 @@
 <div class="card form-card">
     <h3 class="card-title">Set Monthly Budget</h3>
     <form method="POST" action="{{ url_for('reports.set_budget') }}" class="inline-add-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="hidden" name="month" value="{{ sel_month }}">
         <input type="hidden" name="year" value="{{ sel_year }}">
         <div class="filter-row">

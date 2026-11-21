@@ -13,6 +13,7 @@
 <div class="card form-card">
     <h3 class="card-title">Add New Category</h3>
     <form method="POST" action="{{ url_for('categories.add') }}" class="inline-add-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="filter-row">
             <div class="filter-group">
                 <label>Name</label>
@@ -54,6 +55,7 @@
             </div>
             <form method="POST" action="{{ url_for('categories.delete', id=cat.id) }}" class="inline-form"
                   onsubmit="return confirm('Delete category &quot;{{ cat.name }}&quot;?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-sm btn-ghost btn-danger" title="Delete">🗑️</button>
             </form>
         </div>
@@ -78,6 +80,7 @@
             </div>
             <form method="POST" action="{{ url_for('categories.delete', id=cat.id) }}" class="inline-form"
                   onsubmit="return confirm('Delete category &quot;{{ cat.name }}&quot;?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-sm btn-ghost btn-danger" title="Delete">🗑️</button>
             </form>
         </div>

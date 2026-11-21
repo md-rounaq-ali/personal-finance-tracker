@@ -1,9 +1,9 @@
 """
-Authentication Routes — Login, Register, Logout
+Authentication Routes — Login, Register, Logout with Rate Limiting
 """
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from app import db
+from app import db, limiter
 from app.models import User, Category, Account
 
 auth_bp = Blueprint('auth', __name__)
@@ -23,11 +23,13 @@ DEFAULT_CATEGORIES = [
     {'name': 'Shopping', 'type': 'expense', 'icon': '🛍️', 'color': '#6366f1'},
     {'name': 'Healthcare', 'type': 'expense', 'icon': '🏥', 'color': '#14b8a6'},
     {'name': 'Education', 'type': 'expense', 'icon': '📚', 'color': '#0ea5e9'},
+    {'name': 'Transfer', 'type': 'expense', 'icon': '🔄', 'color': '#38bdf8'},
     {'name': 'Other', 'type': 'expense', 'icon': '📦', 'color': '#64748b'},
 ]
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit("15 per minute")
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.index'))
@@ -39,7 +41,7 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
-            login_user(user, remember=request.form.get('remember'))
+            login_user(user, remember=bool(request.form.get('remember')))
             next_page = request.args.get('next')
             flash('Welcome back! 👋', 'success')
             return redirect(next_page or url_for('dashboard.index'))
@@ -50,21 +52,22 @@ def login():
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.index'))
 
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
 
         # Validation
         errors = []
-        if len(username) < 3:
-            errors.append('Username must be at least 3 characters.')
-        if '@' not in email:
+        if len(username) < 3 or len(username) > 50:
+            errors.append('Username must be between 3 and 50 characters.')
+        if '@' not in email or '.' not in email:
             errors.append('Please enter a valid email address.')
         if len(password) < 6:
             errors.append('Password must be at least 6 characters.')

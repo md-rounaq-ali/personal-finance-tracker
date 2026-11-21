@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Budget Planner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Budget Planner 🎯</h1>
+        <p class="page-subtitle">Set monthly category spending limits and track your goals</p>
+    </div>
+
+    <!-- Month / Year Selector -->
+    <form method="GET" class="filter-form" style="display: flex; gap: 0.5rem; align-items: center;">
+        <select name="month" class="form-select" onchange="this.form.submit()">
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if m == sel_month %}selected{% endif %}>
+                {{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1] }}
+            </option>
+            {% endfor %}
+        </select>
+        <select name="year" class="form-select" onchange="this.form.submit()">
+            {% for y in years %}
+            <option value="{{ y }}" {% if y == sel_year %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<!-- Budget Overview Metrics -->
+<div class="summary-cards" style="margin-bottom: 2rem;">
+    <div class="card summary-card">
+        <span class="card-label">Total Budgeted</span>
+        <span class="card-value">₹{{ "{:,.2f}".format(total_budgeted) }}</span>
+    </div>
+    <div class="card summary-card">
+        <span class="card-label">Total Spent</span>
+        <span class="card-value expense">₹{{ "{:,.2f}".format(total_spent) }}</span>
+    </div>
+    <div class="card summary-card">
+        <span class="card-label">Remaining Safe Spend</span>
+        <span class="card-value {% if total_remaining >= 0 %}income{% else %}expense{% endif %}">
+            ₹{{ "{:,.2f}".format(total_remaining) }}
+        </span>
+    </div>
+</div>
+
+<!-- Add / Update Budget Form -->
+<div class="card form-card" style="margin-bottom: 2rem;">
+    <h3 class="card-title">Set Category Budget</h3>
+    <form method="POST" action="{{ url_for('budgets.add') }}" class="inline-add-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="month" value="{{ sel_month }}">
+        <input type="hidden" name="year" value="{{ sel_year }}">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Expense Category</label>
+                <select name="category_id" required>
+                    <option value="">Select category</option>
+                    {% for cat in expense_categories %}
+                    <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Budget Limit (₹)</label>
+                <input type="number" name="amount" step="50" min="50" required placeholder="5000">
+            </div>
+            <div class="filter-group" style="align-self: flex-end;">
+                <button type="submit" class="btn btn-primary">+ Save Budget</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Budget Category Cards -->
+<div class="card">
+    <h3 class="card-title" style="margin-bottom: 1.25rem;">Category Spending Limits</h3>
+    {% if budget_items %}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% for item in budget_items %}
+        <div class="budget-item-card" style="background: rgba(30, 41, 59, 0.5); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">{{ item.category.icon }}</span>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.1rem; color: #f8fafc;">{{ item.category.name }}</h4>
+                        <span class="text-muted" style="font-size: 0.85rem;">
+                            Spent ₹{{ "{:,.2f}".format(item.spent) }} of ₹{{ "{:,.2f}".format(item.amount) }}
+                        </span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="badge {% if item.is_over %}badge-danger{% elif item.raw_percentage >= 80 %}badge-warning{% else %}badge-success{% endif %}"
+                          style="padding: 0.35rem 0.75rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem;
+                          background: {% if item.is_over %}rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444;{% elif item.raw_percentage >= 80 %}rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b;{% else %}rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981;{% endif %}">
+                        {{ item.raw_percentage }}%
+                    </span>
+                    <form method="POST" action="{{ url_for('budgets.delete', id=item.id) }}"
+                          onsubmit="return confirm('Remove budget for {{ item.category.name }}?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-sm btn-ghost btn-danger" title="Delete">🗑️</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar-container" style="background: rgba(15, 23, 42, 0.6); height: 10px; border-radius: 999px; overflow: hidden;">
+                <div class="progress-bar-fill" style="width: {{ item.percentage }}%; height: 100%; border-radius: 999px; transition: width 0.5s ease;
+                     background: {% if item.is_over %}#ef4444{% elif item.raw_percentage >= 80 %}#f59e0b{% else %}#10b981{% endif %};"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.85rem;">
+                <span class="text-muted">
+                    {% if item.is_over %}
+                    <span style="color: #ef4444; font-weight: 600;">Exceeded by ₹{{ "{:,.2f}".format(item.spent - item.amount) }}</span>
+                    {% else %}
+                    Safe to spend: ₹{{ "{:,.2f}".format(item.remaining) }}
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-icon">🎯</span>
+        <p>No budgets configured for this month. Set one above to prevent overspending!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -12,6 +12,7 @@
 
 <div class="card form-card">
     <form method="POST" class="transaction-form" id="addTransactionForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <!-- Type Toggle -->
         <div class="type-toggle">
             <label class="type-option">
