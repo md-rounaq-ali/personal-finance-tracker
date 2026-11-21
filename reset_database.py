@@ -1,11 +1,18 @@
 """
 Database Reset Utility — Safely purges all registered users, transactions, and OTP records
+Supports --cloud flag to purge the live Clever Cloud production database.
 """
-import os
 import sys
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# If --cloud is specified, override DATABASE_URL with Clever Cloud credentials
+if '--cloud' in sys.argv:
+    CLOUD_DB = "mysql+pymysql://uxalmfjgjvtfjurr:6EWiN7hocZuoMxklRQoI@bkyprysysfkerjvkumqz-mysql.services.clever-cloud.com:3306/bkyprysysfkerjvkumqz?charset=utf8mb4"
+    os.environ['DATABASE_URL'] = CLOUD_DB
+    print("🌐 Targeting Live Clever Cloud Database for purge...")
 
 from app import create_app, db
 
@@ -13,7 +20,8 @@ app = create_app()
 
 def wipe_all_users():
     with app.app_context():
-        print("⚠️  Initiating complete database purge of all registered users...")
+        target_host = db.engine.url.host or 'localhost'
+        print(f"⚠️  Initiating complete database purge on: {target_host}...")
         
         try:
             # Disable foreign key checks so child rows don't block deletion
@@ -46,7 +54,6 @@ def wipe_all_users():
             print("Database is completely clean and ready for fresh registrations.")
         except Exception as e:
             db.session.rollback()
-            # Always ensure foreign key checks are re-enabled
             try:
                 db.session.execute(db.text("SET FOREIGN_KEY_CHECKS = 1;"))
                 db.session.commit()

@@ -83,4 +83,22 @@ def create_app(config_class=Config):
         db.session.rollback()
         return render_template('errors/500.html', error=error), 500
 
+    # Auto-sync database schema on startup (ensures cloud DB always has required tables & columns)
+    with app.app_context():
+        try:
+            db.create_all()
+            from sqlalchemy import inspect, text
+            inspector = inspect(db.engine)
+            if 'users' in inspector.get_table_names():
+                cols = [c['name'] for c in inspector.get_columns('users')]
+                with db.engine.connect() as conn:
+                    if 'is_admin' not in cols:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;"))
+                        conn.commit()
+                    if 'is_verified' not in cols:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT TRUE;"))
+                        conn.commit()
+        except Exception as e:
+            app.logger.warning(f"Database schema auto-sync notice: {e}")
+
     return app

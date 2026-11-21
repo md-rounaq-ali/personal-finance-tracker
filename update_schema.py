@@ -1,11 +1,18 @@
 """
 Database Schema Sync Utility — Adds OTP table and new User columns if missing
+Supports --cloud flag to directly sync the live Clever Cloud production database.
 """
+import sys
 import os
-import pymysql
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# If --cloud is specified, override DATABASE_URL with Clever Cloud credentials
+if '--cloud' in sys.argv:
+    CLOUD_DB = "mysql+pymysql://uxalmfjgjvtfjurr:6EWiN7hocZuoMxklRQoI@bkyprysysfkerjvkumqz-mysql.services.clever-cloud.com:3306/bkyprysysfkerjvkumqz?charset=utf8mb4"
+    os.environ['DATABASE_URL'] = CLOUD_DB
+    print("🌐 Targeting Live Clever Cloud Database...")
 
 from app import create_app, db
 
@@ -13,16 +20,15 @@ app = create_app()
 
 def sync_schema():
     with app.app_context():
-        print("🔄 Syncing database schema...")
+        print(f"🔄 Syncing database schema on: {db.engine.url.host}...")
         
         # 1. Create any missing tables (like otp_verifications)
         db.create_all()
-        print("✅ Checked tables: otp_verifications verified/created.")
+        print("✅ Tables verified (otp_verifications, users, accounts, etc.).")
         
         # 2. Add is_admin and is_verified columns to users if missing
         engine = db.engine
         with engine.connect() as conn:
-            # Check users columns
             result = conn.execute(db.text("SHOW COLUMNS FROM users;"))
             cols = [row[0] for row in result.fetchall()]
             
@@ -42,7 +48,7 @@ def sync_schema():
             else:
                 print("ℹ️ 'is_verified' column already present.")
 
-        print("🎉 Database schema is fully synced and up to date!")
+        print("🎉 Database schema is 100% synchronized and up to date!")
 
 if __name__ == '__main__':
     sync_schema()
