@@ -32,3 +32,11 @@ def test_sitemap_xml(client):
     assert 'xml' in response.content_type
     assert b'<urlset' in response.data
     assert b'https://personal-finance-tracker-l1n2.onrender.com/' in response.data
+
+
+def test_health_endpoints(client):
+    for endpoint in ['/health', '/api/health', '/api/v1/health']:
+        resp = client.get(endpoint)
+        assert resp.status_code == 200
+        assert b'online' in resp.data
+

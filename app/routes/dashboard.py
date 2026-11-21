@@ -47,6 +47,24 @@ def sitemap_xml():
     return render_template('sitemap.xml'), 200, {'Content-Type': 'application/xml'}
 
 
+@dashboard_bp.route('/health')
+@dashboard_bp.route('/api/health')
+def health_check():
+    """Direct root-level health check endpoint for uptime monitors & cron jobs"""
+    try:
+        db.session.execute(db.text("SELECT 1"))
+        db_status = "healthy"
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+
+    return {
+        "status": "online",
+        "service": "FinTrack Keep-Alive",
+        "version": "1.0.0",
+        "database": db_status
+    }, 200
+
+
 @dashboard_bp.route('/dashboard')
 @login_required
 def index():
