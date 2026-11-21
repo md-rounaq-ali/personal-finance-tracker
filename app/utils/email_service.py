@@ -301,3 +301,100 @@ def verify_otp_code(email, code, purpose='register'):
     otp_record.is_used = True
     db.session.commit()
     return True, None
+
+
+def send_welcome_email(to_email, username):
+    """
+    Sends a professional Welcome Email upon successful account creation.
+    Fails safely without breaking user registration if email service is unavailable.
+    """
+    to_email = to_email.strip().lower()
+    username = username.strip() if username else "there"
+
+    subject = "Welcome to FinTrack! 🚀 Your Account is Ready"
+
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to FinTrack</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0b1120; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e2e8f0;">
+    <div style="max-width: 600px; margin: 40px auto; background-color: #0f172a; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);">
+        <!-- Header Banner -->
+        <div style="background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%); padding: 36px 30px; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 8px;">💰</div>
+            <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 700; letter-spacing: -0.5px;">FinTrack</h1>
+            <p style="margin: 8px 0 0; color: #e6fffa; font-size: 14px; font-weight: 500;">Smart Personal Finance & Budgeting</p>
+        </div>
+
+        <!-- Body Content -->
+        <div style="padding: 36px 32px;">
+            <h2 style="margin: 0 0 16px; color: #f8fafc; font-size: 20px; font-weight: 600;">Welcome aboard, {username}! 🎉</h2>
+            <p style="margin: 0 0 20px; color: #94a3b8; font-size: 15px; line-height: 1.6;">
+                Your FinTrack account has been successfully verified and activated. You're now equipped with the tools to take complete control of your financial growth.
+            </p>
+
+            <!-- Feature Highlights -->
+            <div style="background-color: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 28px; border: 1px solid #334155;">
+                <p style="margin: 0 0 12px; color: #f1f5f9; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">What you can do right now:</p>
+                <div style="padding: 6px 0; font-size: 14px; color: #cbd5e1; line-height: 1.6;">
+                    💸 <strong>Track Expenses & Income:</strong> Log transactions effortlessly with smart categories.<br>
+                    🏦 <strong>Multi-Account Management:</strong> Keep Bank, Cash, and Savings synced.<br>
+                    🎯 <strong>Set Monthly Budgets:</strong> Establish category limits to avoid overspending.<br>
+                    📊 <strong>Visual Reports:</strong> View real-time analytics on your spending habits.
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div style="text-align: center; margin: 32px 0;">
+                <a href="https://personal-finance-tracker-l1n2.onrender.com/dashboard" style="display: inline-block; background-color: #10b981; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 15px; padding: 14px 32px; border-radius: 10px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);">
+                    Open Your Dashboard →
+                </a>
+            </div>
+
+            <p style="margin: 28px 0 0; color: #64748b; font-size: 13px; line-height: 1.5;">
+                🔒 <em>Security reminder: Never share your account credentials with anyone. FinTrack will never ask for your password via email.</em>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #0b1120; padding: 20px 30px; text-align: center; border-top: 1px solid #1e293b;">
+            <p style="margin: 0; color: #64748b; font-size: 12px;">
+                © 2026 FinTrack Security &bull; personal-finance-tracker-l1n2.onrender.com
+            </p>
+        </div>
+    </div>
+</body>
+</html>"""
+
+    text_content = f"""Welcome to FinTrack, {username}!
+
+Your account has been successfully created and your email is verified.
+
+Log in and visit your dashboard: https://personal-finance-tracker-l1n2.onrender.com/dashboard
+
+What you can do with FinTrack:
+- Track expenses and income
+- Manage Bank and Cash accounts
+- Set monthly budgets
+- View visual financial analytics
+
+Best regards,
+FinTrack Team
+"""
+
+    try:
+        sent, err = send_smtp_email(
+            to_email=to_email,
+            subject=subject,
+            html_content=html_content,
+            text_content=text_content
+        )
+        return sent, err
+    except Exception as e:
+        if current_app:
+            current_app.logger.warning(f"Failed to dispatch welcome email to {to_email}: {e}")
+        return False, str(e)
+

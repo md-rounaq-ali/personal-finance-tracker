@@ -108,6 +108,15 @@ def test_login_and_logout(client, test_user):
     assert logout_resp.status_code == 200
     assert b'You have been logged out' in logout_resp.data
 
+    # Unregistered user login redirect to register
+    unregistered_resp = client.post('/login', data={
+        'email': 'unknown_person@example.com',
+        'password': 'AnyPassword123!'
+    }, follow_redirects=True)
+    assert unregistered_resp.status_code == 200
+    assert b'No account found with this email' in unregistered_resp.data
+    assert b'unknown_person@example.com' in unregistered_resp.data
+
 
 def test_unauthorized_access(client):
     response = client.get('/transactions', follow_redirects=True)

@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 from app import db, limiter
 from app.models import User, Category, Account
-from app.utils.email_service import create_and_send_otp, verify_otp_code
+from app.utils.email_service import create_and_send_otp, verify_otp_code, send_welcome_email
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -40,19 +40,28 @@ def login():
         login_identifier = (request.form.get('email') or request.form.get('username') or '').strip().lower()
         password = request.form.get('password', '')
 
+        if not login_identifier:
+            flash('Please enter your email address to sign in.', 'error')
+            return render_template('auth/login.html')
+
         # Lookup primarily by email (or username fallback)
         user = User.query.filter(
             (func.lower(User.email) == login_identifier) | 
             (func.lower(User.username) == login_identifier)
         ).first()
 
-        if user and user.check_password(password):
+        # If user is not registered, redirect them to create an account
+        if not user:
+            flash("No account found with this email. Please create a free account to get started! 🚀", 'info')
+            return redirect(url_for('auth.register', email=login_identifier if '@' in login_identifier else ''))
+
+        if user.check_password(password):
             login_user(user, remember=bool(request.form.get('remember')))
             next_page = request.args.get('next')
             flash('Welcome back! 👋', 'success')
             return redirect(next_page or url_for('dashboard.index'))
         else:
-            flash('Invalid email or password.', 'error')
+            flash('Incorrect password. Please try again or click Forgot Password.', 'error')
 
     return render_template('auth/login.html')
 
@@ -158,8 +167,11 @@ def verify_registration_otp():
         # Clear session
         session.pop('pending_registration', None)
 
+        # Dispatch welcome email to new user
+        send_welcome_email(user.email, user.username)
+
         login_user(user)
-        flash('Email verified and account created successfully! 🎉', 'success')
+        flash('Email verified and account created successfully! 🎉 A welcome email has been sent to your inbox.', 'success')
         return redirect(url_for('dashboard.index'))
 
     return render_template('auth/verify_otp.html', email=email)
