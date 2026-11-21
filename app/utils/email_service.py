@@ -32,7 +32,10 @@ def send_via_brevo_http(to_email, subject, html_content, text_content=None):
     if not api_key:
         return False, "BREVO_API_KEY not configured"
 
-    sender_email = os.environ.get('MAIL_USERNAME', 'fintrack.security@gmail.com').strip()
+    sender_email = (
+        os.environ.get('BREVO_SENDER_EMAIL', '').strip()
+        or os.environ.get('MAIL_USERNAME', 'fintrack.security@gmail.com').strip()
+    )
     sender_name = "FinTrack Security"
 
     payload = {
