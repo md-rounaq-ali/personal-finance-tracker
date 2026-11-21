@@ -365,9 +365,20 @@ def send_welcome_email(to_email, username):
         </div>
 
         <!-- Footer -->
-        <div style="background-color: #0b1120; padding: 20px 30px; text-align: center; border-top: 1px solid #1e293b;">
-            <p style="margin: 0; color: #64748b; font-size: 12px;">
-                © 2026 FinTrack Security &bull; personal-finance-tracker-l1n2.onrender.com
+        <div style="background-color: #0b1120; padding: 24px 30px; text-align: center; border-top: 1px solid #1e293b;">
+            <p style="margin: 0 0 8px; color: #cbd5e1; font-size: 13px; font-weight: 500;">
+                © 2026 FinTrack. All rights reserved.
+            </p>
+            <p style="margin: 0 0 14px; color: #94a3b8; font-size: 12.5px;">
+                Developed by <a href="https://md-rounaq-ali.netlify.app/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline; font-weight: 600;">Md Rounaq Ali</a>
+            </p>
+            <div style="margin: 14px 0 14px;">
+                <a href="https://www.google.com/search?q=md+rounaq+ali" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: rgba(56, 189, 248, 0.12); color: #38bdf8; text-decoration: none; font-size: 12px; font-weight: 600; padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(56, 189, 248, 0.35);">
+                    🔍 Search Creator on Google: <span style="text-decoration: underline;">md rounaq ali ↗</span>
+                </a>
+            </div>
+            <p style="margin: 0; color: #64748b; font-size: 11px;">
+                personal-finance-tracker-l1n2.onrender.com
             </p>
         </div>
     </div>
