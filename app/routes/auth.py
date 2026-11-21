@@ -4,6 +4,7 @@ Authentication Routes — Login, Register with Email OTP, Forgot Password with O
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
+from sqlalchemy import func
 from app import db, limiter
 from app.models import User, Category, Account
 from app.utils.email_service import create_and_send_otp, verify_otp_code
@@ -36,10 +37,14 @@ def login():
         return redirect(url_for('dashboard.index'))
 
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
+        login_identifier = (request.form.get('email') or request.form.get('username') or '').strip().lower()
         password = request.form.get('password', '')
 
-        user = User.query.filter_by(username=username).first()
+        # Lookup primarily by email (or username fallback)
+        user = User.query.filter(
+            (func.lower(User.email) == login_identifier) | 
+            (func.lower(User.username) == login_identifier)
+        ).first()
 
         if user and user.check_password(password):
             login_user(user, remember=bool(request.form.get('remember')))
@@ -47,7 +52,7 @@ def login():
             flash('Welcome back! 👋', 'success')
             return redirect(next_page or url_for('dashboard.index'))
         else:
-            flash('Invalid username or password.', 'error')
+            flash('Invalid email or password.', 'error')
 
     return render_template('auth/login.html')
 

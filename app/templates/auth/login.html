@@ -28,9 +28,9 @@
             <form method="POST" class="auth-form" id="loginForm">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required autofocus
-                           placeholder="Enter your username">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required autofocus
+                           placeholder="your@email.com">
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
