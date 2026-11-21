@@ -34,8 +34,13 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required
-                           placeholder="Enter your password">
+                    <div class="password-input-wrapper">
+                        <input type="password" id="password" name="password" required
+                               placeholder="Enter your password">
+                        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)" title="Show password">
+                            👁️
+                        </button>
+                    </div>
                 </div>
                 <div class="form-row" style="display: flex; justify-content: space-between; align-items: center;">
                     <label class="checkbox-label">
@@ -51,5 +56,21 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePasswordVisibility(fieldId, btn) {
+            const field = document.getElementById(fieldId);
+            if (!field) return;
+            if (field.type === 'password') {
+                field.type = 'text';
+                btn.textContent = '🙈';
+                btn.title = 'Hide password';
+            } else {
+                field.type = 'password';
+                btn.textContent = '👁️';
+                btn.title = 'Show password';
+            }
+        }
+    </script>
 </body>
 </html>
