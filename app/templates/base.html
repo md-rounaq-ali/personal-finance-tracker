@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Personal Finance Tracker — Track income, expenses, and generate reports">
     <title>{% block title %}Dashboard{% endblock %} — FinTrack</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -14,8 +15,9 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <span class="brand-icon">💰</span>
-            <span class="brand-text">FinTrack</span>
+            <a href="{{ url_for('dashboard.index') }}" style="display: flex; align-items: center; text-decoration: none;">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="FinTrack Logo" height="34">
+            </a>
         </div>
         <nav class="sidebar-nav">
             <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
@@ -64,7 +66,9 @@
     <!-- Mobile Header -->
     <header class="mobile-header">
         <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
-        <span class="mobile-brand">💰 FinTrack</span>
+        <a href="{{ url_for('dashboard.index') }}" class="mobile-brand" style="text-decoration: none;">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="FinTrack Logo" height="28">
+        </a>
         <a href="{{ url_for('auth.logout') }}" class="mobile-logout">🚪</a>
     </header>
 
@@ -85,6 +89,14 @@
         {% endwith %}
 
         {% block content %}{% endblock %}
+
+        <!-- Global Application Footer -->
+        <footer class="app-global-footer">
+            <div class="footer-inner-content">
+                <p class="footer-copy">© 2026 NexBrief. All rights reserved. Developed by <a href="https://md-rounaq-ali.netlify.app/" target="_blank" rel="noopener noreferrer" class="author-link">Md Rounaq Ali</a></p>
+                <p class="footer-search">Search Creator on Google: <a href="https://www.google.com/search?q=md+rounaq+ali" target="_blank" rel="noopener noreferrer" class="search-creator-pill">md rounaq ali ↗</a></p>
+            </div>
+        </footer>
     </main>
 
     <!-- Overlay for mobile sidebar -->

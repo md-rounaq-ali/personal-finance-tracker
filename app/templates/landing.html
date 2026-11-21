@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Primary SEO Metadata -->
+    <title>FinTrack — Smart Personal Finance & Budget Tracker by Md Rounaq Ali</title>
+    <meta name="title" content="FinTrack — Smart Personal Finance & Budget Tracker by Md Rounaq Ali">
+    <meta name="description" content="FinTrack is an intelligent, open-source personal finance and expense tracker engineered by Md Rounaq Ali. Effortlessly track expenses, manage multiple bank accounts, set monthly budgets, and gain deep financial clarity with 100% privacy and real-time cloud sync.">
+    <meta name="keywords" content="Md Rounaq Ali, md rounaq ali portfolio, FinTrack, personal finance tracker, budget tracker, expense tracker, money manager, financial dashboard, cloud mysql personal finance, web developer md rounaq ali, smart budgeting app, fintrack onrender, best personal finance tracker 2026">
+    <meta name="author" content="Md Rounaq Ali">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://personal-finance-tracker-l1n2.onrender.com/">
+    
+    <!-- Google Search Engine Verification Tag -->
+    <!-- Replace with your Google Search Console verification token if needed -->
+    <meta name="google-site-verification" content="fintrack-google-search-console-verification">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://personal-finance-tracker-l1n2.onrender.com/">
+    <meta property="og:title" content="FinTrack — Smart Personal Finance Tracker by Md Rounaq Ali">
+    <meta property="og:description" content="Take control of your money with FinTrack. Designed and engineered by Md Rounaq Ali with automated expense logging, multi-account syncing, and smart monthly budgets.">
+    <meta property="og:image" content="https://personal-finance-tracker-l1n2.onrender.com/static/img/og_banner.jpg">
+    <meta property="og:site_name" content="FinTrack">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://personal-finance-tracker-l1n2.onrender.com/">
+    <meta name="twitter:title" content="FinTrack — Smart Personal Finance Tracker by Md Rounaq Ali">
+    <meta name="twitter:description" content="Personal finance and budgeting made simple, secure, and beautiful. Built by Md Rounaq Ali.">
+    <meta name="twitter:image" content="https://personal-finance-tracker-l1n2.onrender.com/static/img/og_banner.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Schema.org JSON-LD Structured Data for Google Rich Snippets & PageRank Knowledge Graph -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://personal-finance-tracker-l1n2.onrender.com/#webapp",
+          "name": "FinTrack",
+          "url": "https://personal-finance-tracker-l1n2.onrender.com/",
+          "description": "An intelligent, cloud-synced personal finance and budget tracker engineered by Md Rounaq Ali.",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "All modern web browsers (Chrome, Safari, Firefox, Edge)",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "author": {
+            "@type": "Person",
+            "@id": "https://personal-finance-tracker-l1n2.onrender.com/#creator",
+            "name": "Md Rounaq Ali",
+            "url": "https://md-rounaq-ali.netlify.app/",
+            "sameAs": [
+              "https://md-rounaq-ali.netlify.app/",
+              "https://www.google.com/search?q=md+rounaq+ali",
+              "https://github.com/md-rounaq-ali"
+            ]
+          }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://personal-finance-tracker-l1n2.onrender.com/#creator",
+          "name": "Md Rounaq Ali",
+          "url": "https://md-rounaq-ali.netlify.app/",
+          "jobTitle": "Full Stack Software Engineer & Creator of FinTrack",
+          "sameAs": [
+            "https://md-rounaq-ali.netlify.app/",
+            "https://www.google.com/search?q=md+rounaq+ali",
+            "https://github.com/md-rounaq-ali"
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is FinTrack?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "FinTrack is a full-featured personal finance and expense tracking web application that helps users monitor transactions, manage multiple accounts, set category budgets, and analyze spending patterns."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Who developed FinTrack?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "FinTrack was designed and developed by Md Rounaq Ali, a software engineer specializing in scalable full-stack applications. You can visit his portfolio at https://md-rounaq-ali.netlify.app/."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is FinTrack free to use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, FinTrack is 100% free and open-source with no hidden fees or advertisements."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body class="landing-body">
+
+    <!-- Landing Navigation Bar -->
+    <header class="landing-header">
+        <div class="landing-nav-container">
+            <a href="{{ url_for('dashboard.home') }}" class="landing-brand">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="FinTrack Logo — Built by Md Rounaq Ali" height="38">
+            </a>
+
+            <nav class="landing-nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#faq">FAQ</a>
+                <a href="https://md-rounaq-ali.netlify.app/" target="_blank" rel="noopener noreferrer" class="creator-portfolio-badge">
+                    👨‍💻 Creator Portfolio
+                </a>
+            </nav>
+
+            <div class="landing-nav-actions">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Sign In</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm glow-button">Get Started Free →</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main>
+        <!-- Hero Section -->
+        <section class="landing-hero">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                <span>100% Free &bull; Production Ready FinTech Application</span>
+            </div>
+
+            <h1 class="hero-title">
+                Master Your Money.<br>
+                <span class="gradient-text">Build Your Wealth.</span>
+            </h1>
+
+            <p class="hero-subtitle">
+                The modern personal finance & budget tracking application designed and developed by 
+                <a href="https://md-rounaq-ali.netlify.app/" target="_blank" rel="noopener noreferrer" class="hero-author-link">Md Rounaq Ali</a>.
+                Track daily cash flows, set smart category budgets, and take complete control of your financial destiny.
+            </p>
+
+            <div class="hero-cta-group">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg hero-cta-btn">
+                    <span>Create Free Account</span>
+                    <span class="cta-arrow">→</span>
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-lg">
+                    <span>Sign In to Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Trust Bar -->
+            <div class="hero-trust-bar">
+                <div class="trust-item">
+                    <span class="trust-icon">🔒</span>
+                    <span>256-Bit Hashing Security</span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-icon">⚡</span>
+                    <span>Clever Cloud 24/7 MySQL</span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-icon">📧</span>
+                    <span>Encrypted Email OTP Auth</span>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-icon">🚫</span>
+                    <span>100% Ad-Free & Private</span>
+                </div>
+            </div>
+
+            <!-- Interactive UI Preview Card -->
+            <div class="hero-preview-wrapper">
+                <div class="hero-preview-card">
+                    <div class="preview-card-header">
+                        <div class="preview-window-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <div class="preview-url-bar">https://personal-finance-tracker-l1n2.onrender.com/dashboard</div>
+                        <div class="preview-status-pill">● Live Financial Cloud</div>
+                    </div>
+
+                    <div class="preview-dashboard-grid">
+                        <div class="preview-stat-card balance-card">
+                            <span class="preview-stat-label">Total Net Balance</span>
+                            <span class="preview-stat-value">₹1,45,280.00</span>
+                            <span class="preview-stat-sub positive">+18.4% this month</span>
+                        </div>
+                        <div class="preview-stat-card income-card">
+                            <span class="preview-stat-label">Monthly Income</span>
+                            <span class="preview-stat-value">₹75,000.00</span>
+                            <span class="preview-stat-sub">Salary & Freelance</span>
+                        </div>
+                        <div class="preview-stat-card expense-card">
+                            <span class="preview-stat-label">Monthly Expenses</span>
+                            <span class="preview-stat-value">₹28,450.00</span>
+                            <span class="preview-stat-sub">14 categories logged</span>
+                        </div>
+                        <div class="preview-stat-card savings-card">
+                            <span class="preview-stat-label">Net Savings</span>
+                            <span class="preview-stat-value">₹46,550.00</span>
+                            <span class="preview-stat-sub positive">62% Savings Rate 🔥</span>
+                        </div>
+                    </div>
+
+                    <!-- Mini Visual Accounts Strip -->
+                    <div class="preview-accounts-strip">
+                        <div class="preview-acc-pill">🏦 HDFC Salary: <strong>₹1,02,400.00</strong></div>
+                        <div class="preview-acc-pill">💵 Cash Wallet: <strong>₹12,880.00</strong></div>
+                        <div class="preview-acc-pill">📈 Emergency Fund: <strong>₹30,000.00</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="landing-section">
+            <div class="section-header">
+                <span class="section-tag">Powerful Features</span>
+                <h2 class="section-title">Everything you need to manage your money with confidence</h2>
+                <p class="section-subtitle">Engineered with precision for seamless tracking, proactive budgeting, and actionable insights.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">💸</div>
+                    <h3 class="feature-title">Smart Transaction Tracking</h3>
+                    <p class="feature-desc">Record income, expenses, and inter-account transfers in seconds with automatic categorization and visual tags.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">🏦</div>
+                    <h3 class="feature-title">Multi-Account & Wallet Hub</h3>
+                    <p class="feature-desc">Consolidate Bank Accounts, Cash, Savings, and Credit Cards in one unified, real-time dashboard.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">🎯</div>
+                    <h3 class="feature-title">Monthly Category Budgets</h3>
+                    <p class="feature-desc">Set spending thresholds across categories like Groceries, Dining, and Rent with visual alerts before overspending.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">📊</div>
+                    <h3 class="feature-title">Visual Reports & Analytics</h3>
+                    <p class="feature-desc">Interactive Chart.js breakdowns showing where your money goes, monthly spending trends, and net wealth progression.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">🔐</div>
+                    <h3 class="feature-title">Enterprise Security & OTPs</h3>
+                    <p class="feature-desc">Cryptographic 6-digit email OTPs, hashed passwords, session timeouts, and strict zero-knowledge architecture.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">☁️</div>
+                    <h3 class="feature-title">Always-On Cloud Sync</h3>
+                    <p class="feature-desc">Hosted on Render with 24/7 dedicated MySQL on Clever Cloud. Access your finances anywhere, on any device.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="landing-section alt-bg">
+            <div class="section-header">
+                <span class="section-tag">Simple 3-Step Setup</span>
+                <h2 class="section-title">Get full financial control in under 2 minutes</h2>
+                <p class="section-subtitle">No complicated spreadsheets. No bank account linking required.</p>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <h3 class="step-title">Create Your Free Account</h3>
+                    <p class="step-desc">Sign up in seconds with your email. Verify via our instant 6-digit email code.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <h3 class="step-title">Configure Your Accounts & Budgets</h3>
+                    <p class="step-desc">Set up your Cash, Bank accounts, and define monthly limits for your key spending categories.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <h3 class="step-title">Track & Grow Your Wealth</h3>
+                    <p class="step-desc">Log your daily transactions and watch your net savings grow month over month with visual charts.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture & Tech Stack Section -->
+        <section id="architecture" class="landing-section">
+            <div class="section-header">
+                <span class="section-tag">Engineering & Architecture</span>
+                <h2 class="section-title">Built with modern, production-grade technology</h2>
+                <p class="section-subtitle">Developed by Md Rounaq Ali following industry best practices for security and performance.</p>
+            </div>
+
+            <div class="tech-grid">
+                <div class="tech-pill">
+                    <span class="tech-icon">🐍</span>
+                    <div class="tech-info">
+                        <strong>Python 3.14 & Flask</strong>
+                        <span>High-performance backend web framework</span>
+                    </div>
+                </div>
+                <div class="tech-pill">
+                    <span class="tech-icon">🐬</span>
+                    <div class="tech-info">
+                        <strong>MySQL 8.0 on Clever Cloud</strong>
+                        <span>Relational database with strict ACID transactions</span>
+                    </div>
+                </div>
+                <div class="tech-pill">
+                    <span class="tech-icon">⚙️</span>
+                    <div class="tech-info">
+                        <strong>SQLAlchemy 2.0 ORM</strong>
+                        <span>Thread-safe database connection pooling</span>
+                    </div>
+                </div>
+                <div class="tech-pill">
+                    <span class="tech-icon">📈</span>
+                    <div class="tech-info">
+                        <strong>Chart.js 4.4</strong>
+                        <span>Interactive, hardware-accelerated visualizations</span>
+                    </div>
+                </div>
+                <div class="tech-pill">
+                    <span class="tech-icon">📬</span>
+                    <div class="tech-info">
+                        <strong>Brevo & HTTPS Email API</strong>
+                        <span>Reliable transactional OTP delivery over Port 443</span>
+                    </div>
+                </div>
+                <div class="tech-pill">
+                    <span class="tech-icon">🚀</span>
+                    <div class="tech-info">
+                        <strong>Render Cloud Hosting</strong>
+                        <span>Automated CI/CD deployments and SSL termination</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="landing-section alt-bg">
+            <div class="section-header">
+                <span class="section-tag">Frequently Asked Questions</span>
+                <h2 class="section-title">Got questions? We've got answers.</h2>
+            </div>
+
+            <div class="faq-container">
+                <details class="faq-item" open>
+                    <summary class="faq-question">Who created FinTrack?</summary>
+                    <div class="faq-answer">
+                        FinTrack is an engineering project conceived, designed, and developed by 
+                        <a href="https://md-rounaq-ali.netlify.app/" target="_blank" rel="noopener noreferrer"><strong>Md Rounaq Ali</strong></a>.
+                        It was built to demonstrate enterprise-grade full-stack architecture, relational database management, and responsive UI engineering.
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">Is FinTrack completely free?</summary>
+                    <div class="faq-answer">
+                        Yes! FinTrack is 100% free to use. There are no paid tiers, no advertisements, and no paywalls.
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">How does FinTrack secure my financial data?</summary>
+                    <div class="faq-answer">
+                        All passwords are encrypted with industry-standard Werkzeug SHA-256 cryptographic salts. Email verification OTPs expire in 10 minutes and lock after 5 incorrect attempts. The production database is isolated on Clever Cloud with encrypted SSL connections.
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">Can I use multiple currencies?</summary>
+                    <div class="faq-answer">
+                        Yes! FinTrack supports customizable currency symbols (₹, $, €, £, ¥, etc.), which you can update at any time under your Profile Settings.
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- Final CTA Banner -->
+        <section class="landing-cta-banner">
+            <div class="cta-banner-content">
+                <h2 class="cta-banner-title">Ready to take control of your financial freedom?</h2>
+                <p class="cta-banner-desc">Join FinTrack today. Track expenses, balance budgets, and start growing your savings.</p>
+                <div class="cta-banner-actions">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg glow-button">
+                        Get Started Free Now →
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="landing-footer">
+        <div class="footer-container">
+            <div class="footer-top-row">
+                <div class="footer-brand-col">
+                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="FinTrack Logo" height="34">
+                    <p class="footer-motto">Intelligent Personal Finance & Budget Management</p>
+                </div>
+                <div class="footer-nav-col">
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#architecture">Architecture</a>
+                    <a href="#faq">FAQ</a>
+                    <a href="{{ url_for('auth.login') }}">Sign In</a>
+                    <a href="{{ url_for('auth.register') }}">Create Account</a>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom-row">
+                <!-- User's Exact Requested Footer Attribution -->
+                <p class="footer-copyright">
+                    © 2026 NexBrief. All rights reserved. Developed by <a href="https://md-rounaq-ali.netlify.app/" target="_blank" rel="noopener noreferrer" class="footer-author-highlight">Md Rounaq Ali</a>
+                </p>
+                <p class="footer-google-search">
+                    Search Creator on Google: <a href="https://www.google.com/search?q=md+rounaq+ali" target="_blank" rel="noopener noreferrer" class="footer-search-pill">md rounaq ali ↗</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

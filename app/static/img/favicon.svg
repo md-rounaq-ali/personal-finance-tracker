@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="favGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="64" height="64" rx="16" fill="#0b1120" />
+  <!-- Hexagonal Shield -->
+  <polygon points="32,8 54,20 54,44 32,56 10,44 10,20" fill="#0f172a" stroke="url(#favGrad)" stroke-width="3" />
+  <!-- Chart Arrow -->
+  <path d="M18 40 L27 30 L35 35 L47 19" stroke="url(#favGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <polygon points="47,19 38,19 47,28" fill="#10b981" />
+  <circle cx="35" cy="35" r="3" fill="#06b6d4" />
+</svg>

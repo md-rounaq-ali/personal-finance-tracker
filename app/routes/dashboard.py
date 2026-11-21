@@ -1,7 +1,7 @@
 """
 Dashboard Route — High-performance queries, summary cards, charts, recent transactions
 """
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for, Response
 from flask_login import login_required, current_user
 from sqlalchemy import func, extract
 from datetime import datetime, date
@@ -13,6 +13,41 @@ dashboard_bp = Blueprint('dashboard', __name__)
 
 
 @dashboard_bp.route('/')
+def home():
+    """
+    Public SEO-optimized Landing Page.
+    Logged-in users are automatically routed to their active dashboard.
+    """
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard.index'))
+    return render_template('landing.html')
+
+
+@dashboard_bp.route('/robots.txt')
+def robots_txt():
+    """Search Engine Crawling Directives for Googlebot & Bingbot"""
+    content = """User-agent: *
+Allow: /
+Allow: /static/
+Disallow: /admin
+Disallow: /transactions
+Disallow: /accounts
+Disallow: /budgets
+Disallow: /reports
+Disallow: /profile
+
+Sitemap: https://personal-finance-tracker-l1n2.onrender.com/sitemap.xml
+"""
+    return Response(content, mimetype="text/plain")
+
+
+@dashboard_bp.route('/sitemap.xml')
+def sitemap_xml():
+    """XML Sitemap for Search Engine Indexing & PageRank Discovery"""
+    return render_template('sitemap.xml'), 200, {'Content-Type': 'application/xml'}
+
+
+@dashboard_bp.route('/dashboard')
 @login_required
 def index():
     today = date.today()

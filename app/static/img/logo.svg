@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
+  <defs>
+    <!-- Emblem Gradient -->
+    <linearGradient id="finTrackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <!-- Subtle Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Icon Mark -->
+  <g transform="translate(6, 6)">
+    <!-- Hexagonal Shield Base -->
+    <polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#0f172a" stroke="url(#finTrackGrad)" stroke-width="2.5" />
+    <!-- Inner Glowing Accents -->
+    <polygon points="24,6 40,15 40,33 24,42 8,33 8,15" fill="#1e293b" opacity="0.6" />
+    <!-- Upward Trend Chart Lines -->
+    <path d="M12 32 L19 24 L25 28 L35 15" stroke="url(#finTrackGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Arrow Head -->
+    <polygon points="35,15 28,15 35,22" fill="#10b981" />
+    <!-- Financial Pulse Node -->
+    <circle cx="25" cy="28" r="2.5" fill="#06b6d4" />
+    <circle cx="19" cy="24" r="2" fill="#14b8a6" />
+  </g>
+
+  <!-- Typography -->
+  <text x="64" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif" font-weight="800" font-size="28" fill="#ffffff" letter-spacing="-0.5px">
+    Fin<tspan fill="url(#finTrackGrad)">Track</tspan>
+  </text>
+  <!-- Tiny Subtitle / Badge -->
+  <text x="180" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif" font-weight="600" font-size="9" fill="#10b981" letter-spacing="1.2px">PRO</text>
+</svg>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — FinTrack</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -12,8 +13,10 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <span class="auth-logo">💰</span>
-                <h1>FinTrack</h1>
+                <a href="{{ url_for('dashboard.home') }}" style="display: inline-block; text-decoration: none; margin-bottom: 8px;">
+                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="FinTrack Logo" height="42">
+                </a>
+                <h1>Sign In</h1>
                 <p>Sign in to your account</p>
             </div>
 
@@ -53,7 +56,12 @@
             </form>
             <div class="auth-footer">
                 <p>Don't have an account? <a href="{{ url_for('auth.register') }}">Create one</a></p>
+                <p style="margin-top: 8px;"><a href="{{ url_for('dashboard.home') }}" style="color: #94a3b8; font-size: 0.85rem;">← Back to Home</a></p>
             </div>
+        </div>
+        <div class="auth-page-footer">
+            <p>© 2026 NexBrief. All rights reserved. Developed by <a href="https://md-rounaq-ali.netlify.app/" target="_blank" rel="noopener noreferrer">Md Rounaq Ali</a></p>
+            <p class="search-line">Search Creator: <a href="https://www.google.com/search?q=md+rounaq+ali" target="_blank" rel="noopener noreferrer">md rounaq ali ↗</a></p>
         </div>
     </div>
 
