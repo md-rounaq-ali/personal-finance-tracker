@@ -3,6 +3,11 @@
 venv/
 .venv/
 
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
 # Python
 __pycache__/
 *.py[cod]

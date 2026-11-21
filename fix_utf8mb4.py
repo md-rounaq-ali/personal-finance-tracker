@@ -4,11 +4,24 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Use your Clever Cloud connection details
-DB_HOST = "bkyprysysfkerjvkumqz-mysql.services.clever-cloud.com"
-DB_USER = "uxalmfjgjvtfjurr"
-DB_PASS = "6EWiN7hocZuoMxklRQoI"
-DB_NAME = "bkyprysysfkerjvkumqz"
+# Database connection details from environment or cloud
+database_url = os.environ.get('DATABASE_URL', '')
+if 'mysql' in database_url and '@' in database_url:
+    # Parse standard connection string
+    # mysql+pymysql://user:password@host:port/dbname
+    from urllib.parse import urlparse
+    parsed = urlparse(database_url.replace('mysql+pymysql://', 'mysql://'))
+    DB_HOST = parsed.hostname
+    DB_USER = parsed.username
+    DB_PASS = parsed.password
+    DB_NAME = parsed.path.lstrip('/')
+    DB_PORT = parsed.port or 3306
+else:
+    DB_HOST = os.environ.get('MYSQL_HOST', 'localhost')
+    DB_USER = os.environ.get('MYSQL_USER', 'root')
+    DB_PASS = os.environ.get('MYSQL_PASSWORD', '')
+    DB_NAME = os.environ.get('MYSQL_DB', 'personal_finance_tracker')
+    DB_PORT = int(os.environ.get('MYSQL_PORT', 3306))
 
 print("🔄 Connecting to Clever Cloud database to convert to utf8mb4...")
 

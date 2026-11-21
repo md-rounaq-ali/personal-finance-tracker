@@ -10,7 +10,10 @@ load_dotenv()
 
 # If --cloud is specified, override DATABASE_URL with Clever Cloud credentials
 if '--cloud' in sys.argv:
-    CLOUD_DB = "mysql+pymysql://uxalmfjgjvtfjurr:6EWiN7hocZuoMxklRQoI@bkyprysysfkerjvkumqz-mysql.services.clever-cloud.com:3306/bkyprysysfkerjvkumqz?charset=utf8mb4"
+    CLOUD_DB = os.environ.get('CLOUD_DATABASE_URL') or os.environ.get('DATABASE_URL')
+    if not CLOUD_DB or 'localhost' in CLOUD_DB:
+        print("❌ Error: CLOUD_DATABASE_URL environment variable is required to connect to cloud database.")
+        sys.exit(1)
     os.environ['DATABASE_URL'] = CLOUD_DB
     print("🌐 Targeting Live Clever Cloud Database...")
 
