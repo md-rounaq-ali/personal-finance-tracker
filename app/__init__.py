@@ -40,6 +40,7 @@ def create_app(config_class=Config):
     from app.routes.reports import reports_bp
     from app.routes.budgets import budgets_bp
     from app.routes.api import api_bp
+    from app.routes.admin import admin_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -48,6 +49,7 @@ def create_app(config_class=Config):
     app.register_blueprint(accounts_bp)
     app.register_blueprint(reports_bp)
     app.register_blueprint(budgets_bp)
+    app.register_blueprint(admin_bp)
     app.register_blueprint(api_bp, url_prefix='/api/v1')
 
     # Exempt REST API from CSRF token requirements (API clients use JSON/Auth)

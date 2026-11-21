@@ -42,6 +42,12 @@
                 <span class="nav-icon">🎯</span>
                 <span class="nav-text">Budgets</span>
             </a>
+            {% if current_user.is_authenticated and current_user.has_admin_access %}
+            <a href="{{ url_for('admin.index') }}" class="nav-link {% if request.endpoint and 'admin' in request.endpoint %}active{% endif %}" style="color: #38bdf8;">
+                <span class="nav-icon">🛡️</span>
+                <span class="nav-text">Admin Panel</span>
+            </a>
+            {% endif %}
         </nav>
         <div class="sidebar-footer">
             <div class="user-info">

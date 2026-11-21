@@ -1,5 +1,5 @@
 """
-Database Models — User, Category, Account, Transaction, Budget
+Database Models — User, Category, Account, Transaction, Budget, OTPVerification
 """
 from datetime import datetime, date, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,6 +24,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     currency = db.Column(db.String(5), default='₹')
+    is_admin = db.Column(db.Boolean, default=False)
+    is_verified = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=utc_now)
 
     # Relationships
@@ -38,8 +40,38 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def has_admin_access(self):
+        return bool(self.is_admin or (self.email and self.email.lower() == 'tabrasali7@gmail.com'))
+
     def __repr__(self):
         return f'<User {self.username}>'
+
+
+class OTPVerification(db.Model):
+    __tablename__ = 'otp_verifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), nullable=False, index=True)
+    otp_hash = db.Column(db.String(256), nullable=False)
+    purpose = db.Column(db.String(30), nullable=False)  # 'register', 'forgot_password'
+    created_at = db.Column(db.DateTime, default=utc_now)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    attempts = db.Column(db.Integer, default=0)
+    is_used = db.Column(db.Boolean, default=False)
+
+    def check_otp(self, otp_attempt):
+        return check_password_hash(self.otp_hash, otp_attempt)
+
+    def is_expired(self):
+        now = datetime.now(timezone.utc)
+        exp = self.expires_at
+        if exp.tzinfo is None:
+            exp = exp.replace(tzinfo=timezone.utc)
+        return now > exp
+
+    def __repr__(self):
+        return f'<OTPVerification {self.email} ({self.purpose})>'
 
 
 class Category(db.Model):

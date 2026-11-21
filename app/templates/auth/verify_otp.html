@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email — FinTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <span class="auth-logo">📬</span>
+                <h1>Verify Your Email</h1>
+                <p>We've sent a 6-digit verification code to<br><strong style="color: #38bdf8;">{{ email }}</strong></p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.verify_registration_otp') }}" class="auth-form" id="otpForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="form-group">
+                    <label for="otp" style="text-align: center; display: block;">Enter 6-Digit Code</label>
+                    <input type="text" id="otp" name="otp" required autofocus
+                           placeholder="123456" maxlength="6" pattern="[0-9]{6}"
+                           style="text-align: center; font-size: 1.8rem; letter-spacing: 6px; font-family: monospace; font-weight: 700;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="verifyBtn">Verify & Complete Registration</button>
+            </form>
+
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <form method="POST" action="{{ url_for('auth.resend_otp') }}" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="purpose" value="register"/>
+                    <button type="submit" class="btn btn-sm btn-ghost" style="color: #94a3b8;">
+                        🔄 Didn't receive code? Resend
+                    </button>
+                </form>
+            </div>
+
+            <div class="auth-footer" style="margin-top: 1.5rem;">
+                <p>Wrong email? <a href="{{ url_for('auth.register') }}">Start over</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

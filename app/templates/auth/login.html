@@ -37,11 +37,12 @@
                     <input type="password" id="password" name="password" required
                            placeholder="Enter your password">
                 </div>
-                <div class="form-row">
+                <div class="form-row" style="display: flex; justify-content: space-between; align-items: center;">
                     <label class="checkbox-label">
                         <input type="checkbox" name="remember" value="1">
                         <span>Remember me</span>
                     </label>
+                    <a href="{{ url_for('auth.forgot_password') }}" style="font-size: 0.85rem; color: #38bdf8; text-decoration: none;">Forgot password?</a>
                 </div>
                 <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
             </form>

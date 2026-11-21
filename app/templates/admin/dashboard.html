@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}System Administration{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">System Administration 🛡️</h1>
+        <p class="page-subtitle">Central management portal for <strong>tabrasali7@gmail.com</strong></p>
+    </div>
+</div>
+
+<!-- Admin Overview Metrics -->
+<div class="summary-cards" style="margin-bottom: 2rem;">
+    <div class="card summary-card">
+        <span class="card-label">Total Users</span>
+        <span class="card-value">{{ total_users }}</span>
+    </div>
+    <div class="card summary-card">
+        <span class="card-label">Total Transactions</span>
+        <span class="card-value">{{ total_transactions }}</span>
+    </div>
+    <div class="card summary-card">
+        <span class="card-label">Platform Volume</span>
+        <span class="card-value income">₹{{ "{:,.2f}".format(total_volume) }}</span>
+    </div>
+    <div class="card summary-card">
+        <span class="card-label">Connected Accounts</span>
+        <span class="card-value">{{ total_accounts }}</span>
+    </div>
+</div>
+
+<!-- User Management Table -->
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h3 class="card-title" style="margin: 0;">Registered Users</h3>
+
+        <!-- Search Form -->
+        <form method="GET" action="{{ url_for('admin.index') }}" style="display: flex; gap: 0.5rem;">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search username or email..."
+                   style="padding: 0.5rem 1rem; border-radius: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148, 163, 184, 0.2); color: #fff;">
+            <button type="submit" class="btn btn-sm btn-primary">Search</button>
+            {% if search %}
+            <a href="{{ url_for('admin.index') }}" class="btn btn-sm btn-ghost">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if users %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Registered</th>
+                    <th class="text-center">Accounts</th>
+                    <th class="text-center">Transactions</th>
+                    <th class="text-right">Balance</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in users %}
+                {% set u = item.user %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span class="user-avatar" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                {{ u.username[0]|upper }}
+                            </span>
+                            <span style="font-weight: 600; color: #f8fafc;">{{ u.username }}</span>
+                        </div>
+                    </td>
+                    <td class="text-muted">{{ u.email }}</td>
+                    <td>
+                        {% if item.is_root_admin %}
+                        <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">
+                            👑 Root Admin
+                        </span>
+                        {% elif u.is_admin %}
+                        <span class="badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+                            🛡️ Admin
+                        </span>
+                        {% else %}
+                        <span class="badge" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #475569; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem;">
+                            User
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">{{ u.created_at.strftime('%d %b %Y') if u.created_at else '—' }}</td>
+                    <td class="text-center">{{ item.account_count }}</td>
+                    <td class="text-center">{{ item.transaction_count }}</td>
+                    <td class="text-right" style="font-weight: 600;">₹{{ "{:,.2f}".format(item.total_balance) }}</td>
+                    <td class="text-center actions-cell">
+                        {% if item.is_root_admin or u.id == current_user.id %}
+                        <span class="text-muted" style="font-size: 0.8rem;">Protected</span>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('admin.delete_user', user_id=u.id) }}"
+                              onsubmit="return confirm('WARNING: Are you sure you want to permanently delete user {{ u.username }} and all their financial data?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-sm btn-ghost btn-danger" title="Delete User">
+                                🗑️ Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <div class="pagination" style="margin-top: 1.5rem;">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('admin.index', page=pagination.prev_num, search=search) }}" class="btn btn-sm btn-outline">← Prev</a>
+        {% endif %}
+        <span class="page-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+        {% if pagination.has_next %}
+        <a href="{{ url_for('admin.index', page=pagination.next_num, search=search) }}" class="btn btn-sm btn-outline">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-icon">🔍</span>
+        <p>No registered users found matching your search.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -59,6 +59,9 @@ The project is built on the **Flask Application Factory pattern** with modular B
 ## ✨ Features
 
 - **📊 Real-time Dashboard**: Interactive summaries of income, expenses, net savings, and category-wise spending using Chart.js with optimized $O(1)$ grouped SQL queries.
+- **✉️ Email OTP Account Verification**: Stops fake/unauthorized signups. Every new user must verify a time-sensitive 6-digit OTP sent to their email before their account is activated.
+- **🔑 Forgot Password via OTP**: Secure password recovery via encrypted 6-digit verification codes sent directly to the account email.
+- **🛡️ Dedicated Admin Portal**: Exclusive management panel for `tabrasali7@gmail.com` to view all platform metrics, audit users, monitor transactions, and manage accounts.
 - **🔄 Account-to-Account Transfers**: Atomically transfer funds between accounts (e.g. Bank to Cash or Wallet) without distorting income/expense analytics.
 - **🎯 Dedicated Budget Planner**: Set category thresholds with real-time visual spend progress bars, warning flags (>80%), and over-budget alerts.
 - **🛡️ Enterprise Security**: Protected by CSRF tokens on all POST endpoints, Flask-Limiter brute-force protection, and strict Insecure Direct Object Reference (IDOR) checks.
@@ -154,6 +157,12 @@ The application will be live at `http://localhost:5000`.
    FLASK_APP=run.py
    SECRET_KEY=your_secret_key_here
    DATABASE_URL=mysql+pymysql://root:password@localhost:3306/personal_finance_tracker?charset=utf8mb4
+
+   # Email SMTP Configuration for live OTP delivery (e.g. Gmail)
+   MAIL_SERVER=smtp.gmail.com
+   MAIL_PORT=587
+   MAIL_USERNAME=your_email@gmail.com
+   MAIL_PASSWORD=your_16_char_gmail_app_password
    ```
 
 5. **Run database migrations:**
