@@ -11,6 +11,7 @@ import urllib.request
 import urllib.error
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formatdate, make_msgid
 from datetime import datetime, timedelta, timezone
 from werkzeug.security import generate_password_hash
 from flask import current_app
@@ -143,6 +144,10 @@ def send_smtp_email(to_email, subject, html_content, text_content=None):
     msg['Subject'] = subject
     msg['From'] = mail_sender
     msg['To'] = to_email
+    msg['Reply-To'] = mail_sender
+    msg['Date'] = formatdate(localtime=True)
+    msg['Message-ID'] = make_msgid(domain='gmail.com')
+    msg['Auto-Submitted'] = 'auto-generated'
 
     if text_content:
         msg.attach(MIMEText(text_content, 'plain'))
