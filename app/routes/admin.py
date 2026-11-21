@@ -4,7 +4,7 @@ Admin Panel Routes — Restricted strictly to tabrasali7@gmail.com and system ad
 from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
-from sqlalchemy import func
+from sqlalchemy import func, case
 from app import db
 from app.models import User, Transaction, Account, Category, Budget
 
@@ -45,7 +45,14 @@ def index():
             (User.username.ilike(f'%{search_query}%')) | (User.email.ilike(f'%{search_query}%'))
         )
 
-    users_pagination = query.order_by(User.created_at.desc()).paginate(
+    # Root Admin and Admins are always pinned to the top of the list
+    admin_priority = case(
+        (func.lower(User.email) == 'tabrasali7@gmail.com', 1),
+        (User.is_admin.is_(True), 2),
+        else_=3
+    )
+
+    users_pagination = query.order_by(admin_priority, User.created_at.desc()).paginate(
         page=page, per_page=per_page, error_out=False
     )
 

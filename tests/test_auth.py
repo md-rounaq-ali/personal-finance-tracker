@@ -42,15 +42,30 @@ def test_register_and_verify_otp_flow(client, app):
             assert user.accounts.count() >= 1
 
 
-def test_register_duplicate_username(client, test_user):
+def test_register_duplicate_email(client, test_user):
     response = client.post('/register', data={
-        'username': 'testuser',
-        'email': 'another@domain.com',
+        'username': 'differentuser',
+        'email': 'test@example.com',
         'password': 'Password123',
         'confirm_password': 'Password123'
     }, follow_redirects=True)
 
-    assert b'Username already taken' in response.data
+    assert b'Email is already registered' in response.data
+
+
+def test_update_profile_username(auth_client, app, test_user):
+    # Test user can edit their display name
+    response = auth_client.post('/profile', data={
+        'username': 'New Updated Name',
+        'currency': '₹'
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b'Profile updated successfully' in response.data
+
+    with app.app_context():
+        u = db.session.get(User, test_user)
+        assert u.username == 'New Updated Name'
 
 
 def test_forgot_and_reset_password_flow(client, app, test_user):

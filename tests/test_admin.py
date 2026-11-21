@@ -26,6 +26,7 @@ def test_admin_panel_accessible_for_tabrasali7(client, app):
     assert response.status_code == 200
     assert b'System Administration' in response.data
     assert b'Registered Users' in response.data
+    assert b'Root Admin' in response.data
 
 
 def test_admin_can_delete_regular_user(client, app, test_user):

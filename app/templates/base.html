@@ -50,10 +50,10 @@
             {% endif %}
         </nav>
         <div class="sidebar-footer">
-            <div class="user-info">
+            <a href="{{ url_for('auth.profile') }}" class="user-info" style="text-decoration: none; cursor: pointer; color: inherit;" title="Account & Profile Settings">
                 <span class="user-avatar">{{ current_user.username[0]|upper }}</span>
-                <span class="user-name">{{ current_user.username }}</span>
-            </div>
+                <span class="user-name">{{ current_user.username }} ⚙️</span>
+            </a>
             <a href="{{ url_for('auth.logout') }}" class="nav-link logout-link">
                 <span class="nav-icon">🚪</span>
                 <span class="nav-text">Logout</span>

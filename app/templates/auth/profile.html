@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Profile & Account Settings ⚙️</h1>
+        <p class="page-subtitle">Manage your personal details, display name, and security</p>
+    </div>
+</div>
+
+<div class="card form-card" style="max-width: 600px; margin: 0 auto;">
+    <form method="POST" action="{{ url_for('auth.profile') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <!-- Account Email (Primary Identity) -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label>Primary Account Email (Locked)</label>
+            <input type="email" value="{{ current_user.email }}" disabled
+                   style="background: rgba(15, 23, 42, 0.7); color: #94a3b8; cursor: not-allowed;">
+            <span style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">
+                🔒 Your email is your unique primary identifier across the system.
+            </span>
+        </div>
+
+        <!-- Editable Display Name / Username -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="username">Display Name / Username</label>
+            <input type="text" id="username" name="username" value="{{ current_user.username }}" required
+                   placeholder="Your full name or handle" minlength="3" maxlength="50">
+            <span style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">
+                You can change this anytime. Other users may share the same display name.
+            </span>
+        </div>
+
+        <!-- Preferred Currency -->
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="currency">Currency Symbol</label>
+            <select id="currency" name="currency">
+                <option value="₹" {% if current_user.currency == '₹' %}selected{% endif %}>₹ (INR - Indian Rupee)</option>
+                <option value="$" {% if current_user.currency == '$' %}selected{% endif %}>$ (USD - US Dollar)</option>
+                <option value="€" {% if current_user.currency == '€' %}selected{% endif %}>€ (EUR - Euro)</option>
+                <option value="£" {% if current_user.currency == '£' %}selected{% endif %}>£ (GBP - British Pound)</option>
+            </select>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(148, 163, 184, 0.15); margin: 2rem 0;">
+
+        <!-- Change Password Section -->
+        <h3 class="card-title" style="margin-bottom: 1rem; font-size: 1.1rem;">Change Password (Optional)</h3>
+        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.25rem;">
+            Leave blank if you do not wish to modify your password.
+        </p>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="current_password">Current Password</label>
+            <div class="password-input-wrapper">
+                <input type="password" id="current_password" name="current_password"
+                       placeholder="Enter current password to authorize change">
+                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('current_password', this)" title="Show password">
+                    👁️
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="new_password">New Password</label>
+            <div class="password-input-wrapper">
+                <input type="password" id="new_password" name="new_password" minlength="6"
+                       placeholder="At least 6 characters">
+                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('new_password', this)" title="Show password">
+                    👁️
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="confirm_password">Confirm New Password</label>
+            <div class="password-input-wrapper">
+                <input type="password" id="confirm_password" name="confirm_password" minlength="6"
+                       placeholder="Repeat new password">
+                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('confirm_password', this)" title="Show password">
+                    👁️
+                </button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg">💾 Save Profile Changes</button>
+    </form>
+</div>
+
+<script>
+    function togglePasswordVisibility(fieldId, btn) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        if (field.type === 'password') {
+            field.type = 'text';
+            btn.textContent = '🙈';
+            btn.title = 'Hide password';
+        } else {
+            field.type = 'password';
+            btn.textContent = '👁️';
+            btn.title = 'Show password';
+        }
+    }
+</script>
+{% endblock %}
